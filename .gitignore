@@ -26,6 +26,8 @@ yarn.lock
 # Build files
 /build/
 /dist/
+frontend/dist/
+backend/dist/
 .next/
 out/
 
