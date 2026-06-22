@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ export default function Login() {
     e.preventDefault();
     setError(""); setLoading(true);
     try {
-      const res = await axios.post("http://localhost:8000/api/auth/login", form);
+      const res = await API.post("/auth/login", form);
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user",  JSON.stringify(res.data.user));
       if (res.data.user.role === "admin") navigate("/add-scholarship");

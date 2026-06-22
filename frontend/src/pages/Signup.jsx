@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../api";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ export default function Signup() {
         totalMarks:    Number(form.totalMarks),
       };
 
-      const res = await axios.post("http://localhost:8000/api/auth/signup", payload);
+      const res = await API.post("/auth/signup", payload);
 
       // Save token + user
       localStorage.setItem("token", res.data.token);
