@@ -1,7 +1,7 @@
 import { useState } from "react";
-import Navbar from "../components/Navbar";
-import OpportunityCard from "../components/OpportunityCard";
-import opportunities from "../data/opportunities";
+import Navbar from "../components/Navbar.jsx";
+import OpportunityCard from "../components/OpportunityCard.jsx";
+import opportunities from "../data/opportunities.jsx";
 
 const CATEGORIES = ["All", "Scholarship", "Hackathon", "Competition", "Coding"];
 

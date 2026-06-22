@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/Navbar.jsx";
 
 // ── GAME 1: Math Puzzle ──────────────────────────────────────────
 function MathPuzzle() {

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import OpportunityCard from "../components/OpportunityCard";
-import opportunities from "../data/opportunities";
+import Navbar from "../components/Navbar.jsx";
+import OpportunityCard from "../components/OpportunityCard.jsx";
+import opportunities from "../data/opportunities.jsx";
 
 export default function Recommendations() {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import API from "../api";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/Navbar.jsx";
 import { useNavigate } from "react-router-dom";
 
 export default function AddScholarship() {
