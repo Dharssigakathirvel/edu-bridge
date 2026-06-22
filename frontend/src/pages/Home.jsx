@@ -316,7 +316,7 @@ export default function Home() {
             {[
               { label: "GitHub", href: "https://github.com/Dharssigakathirvel", emoji: "🐙", color: "#24292e", hoverBg: "#f6f8fa" },
               { label: "LeetCode", href: "https://leetcode.com/Dharssigakathirvel", emoji: "💻", color: "#ffa116", hoverBg: "#fff9f0" },
-              { label: "LinkedIn", href: "https://www.linkedin.com/in/dharssigakathirvel", emoji: "💼", color: "#0077b5", hoverBg: "#f0f7fa" },
+              { label: "LinkedIn", href: "https://www.linkedin.com/in/dharssiga-kathirvel-0aa5b5326/", emoji: "💼", color: "#0077b5", hoverBg: "#f0f7fa" },
               { label: "Email", href: "mailto:dharssigakathirvel@gmail.com", emoji: "📧", color: "#e91e8c", hoverBg: "#fdf0f6" }
             ].map(social => (
               <a
