@@ -1,14 +1,14 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Home            from "./tempPages/Home.jsx";
-import Opportunities   from "./tempPages/Opportunities.js";
-import Profile         from "./tempPages/Profile.js";
-import Recommendations from "./tempPages/Recommendations.js";
-import Signup          from "./tempPages/Signup.jsx";
-import AddScholarship  from "./tempPages/AddScholarship.js";
-import Dashboard       from "./tempPages/Dashboard.js";
-import Login           from "./tempPages/Login.js";
-import Games           from "./tempPages/Games.jsx";
+import Home            from "./pages/Home.js";
+import Opportunities   from "./pages/Opportunities.js";
+import Profile         from "./pages/Profile.js";
+import Recommendations from "./pages/Recommendations.js";
+import Signup          from "./pages/Signup.js";
+import AddScholarship  from "./pages/AddScholarship.js";
+import Dashboard       from "./pages/Dashboard.js";
+import Login           from "./pages/Login.js";
+import Games           from "./pages/Games.js";
 
 export default function App() {
   return (
