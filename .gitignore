@@ -3,8 +3,10 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
-yarn.lock
+# DO NOT ignore package-lock.json, yarn.lock, or pnpm-lock.yaml as Vercel needs them for deterministic builds
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
 
 # Environment variables
 .env
@@ -30,6 +32,9 @@ frontend/dist/
 backend/dist/
 .next/
 out/
+
+# Vercel deployment folder
+.vercel
 
 # Runtime
 *.pid
