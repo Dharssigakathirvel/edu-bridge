@@ -22,6 +22,7 @@ export default function Home() {
   return (
     <div className="page-wrap">
       <Navbar />
+      
 
       {/* ── Hero ───────────────────────────────────────── */}
       <section style={{
