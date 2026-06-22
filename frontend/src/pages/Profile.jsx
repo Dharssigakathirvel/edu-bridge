@@ -247,19 +247,6 @@ export default function Profile() {
           </div>
         )}
 
-        {/* Quick links */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:14 }}>
-          <button onClick={() => navigate("/dashboard")} style={{
-            background:"white", border:"2px solid #e3f0ff", borderRadius:18,
-            padding:"14px", fontFamily:"'Nunito',sans-serif", fontWeight:800,
-            fontSize:13, color:"#1565c0", cursor:"pointer",
-          }}>🔍 Find Scholarships</button>
-          <button onClick={() => navigate("/recommendations")} style={{
-            background:"white", border:"2px solid #fce4ef", borderRadius:18,
-            padding:"14px", fontFamily:"'Nunito',sans-serif", fontWeight:800,
-            fontSize:13, color:"#e91e8c", cursor:"pointer",
-          }}>🚀 My Matches</button>
-        </div>
 
         {/* Logout */}
         <button onClick={logout} style={{

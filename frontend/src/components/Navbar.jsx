@@ -9,7 +9,7 @@ export default function Navbar() {
 
   const studentLinks = [
     { to:"/",                label:"Home",    icon:"🏠" },
-    { to:"/dashboard",       label:"Find",    icon:"🔍" },
+    { to:"/opportunities",   label:"Find",    icon:"🔍" },
     { to:"/games",           label:"Games",   icon:"🎮" },
     { to:"/recommendations", label:"Matches", icon:"🚀" },
     { to:"/profile",         label:"Profile", icon:"👤" },
@@ -17,14 +17,14 @@ export default function Navbar() {
 
   const adminLinks = [
     { to:"/",                label:"Home",    icon:"🏠" },
-    { to:"/dashboard",       label:"Find",    icon:"🔍" },
+    { to:"/opportunities",   label:"Find",    icon:"🔍" },
     { to:"/add-scholarship", label:"Admin",   icon:"🛡️" },
     { to:"/profile",         label:"Profile", icon:"👤" },
   ];
 
   const guestLinks = [
     { to:"/",              label:"Home",    icon:"🏠" },
-    { to:"/opportunities", label:"Explore", icon:"🌟" },
+    { to:"/opportunities", label:"Find",    icon:"🔍" },
     { to:"/games",         label:"Games",   icon:"🎮" },
     { to:"/login",         label:"Login",   icon:"🔐" },
     { to:"/signup",        label:"Sign Up", icon:"✨" },

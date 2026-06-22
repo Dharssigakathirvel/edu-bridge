@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 
@@ -16,8 +17,22 @@ const stats = [
   { emoji: "🌟", num: "10K+", label: "Students" },
 ];
 
+const QUOTES = [
+  { text: "The roots of education are bitter, but the fruit is sweet.", author: "Aristotle" },
+  { text: "Education is the passport to the future, for tomorrow belongs to those who prepare for it today.", author: "Malcolm X" },
+  { text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
+  { text: "The beautiful thing about learning is that no one can take it away from you.", author: "B.B. King" },
+  { text: "Do not wait for opportunities, create them.", author: "Roy T. Bennett" },
+  { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" }
+];
+
 export default function Home() {
   const navigate = useNavigate();
+  const [quoteIndex, setQuoteIndex] = useState(0);
+
+  function nextQuote() {
+    setQuoteIndex((prev) => (prev + 1) % QUOTES.length);
+  }
 
   return (
     <div className="page-wrap">
@@ -198,46 +213,148 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── CTA banner ─────────────────────────────────── */}
-      <section style={{ padding: "0 1.5rem 2rem" }}>
+      {/* ── Inspirational Quotes Section ── */}
+      <section style={{ padding: "0 1.5rem 1.5rem" }}>
         <div style={{
-          background: "linear-gradient(135deg,#e91e8c,#1565c0)",
+          background: "linear-gradient(135deg, #1a237e 0%, #1565c0 100%)",
           borderRadius: 24,
-          padding: "2rem 1.5rem",
+          padding: "2.5rem 2rem",
           textAlign: "center",
           color: "white",
+          boxShadow: "0 10px 30px rgba(21, 101, 192, 0.2)",
           position: "relative",
           overflow: "hidden",
         }}>
-          <div style={{ position:"absolute", top:-30, right:-30, width:120, height:120,
-            borderRadius:"50%", background:"rgba(255,255,255,0.1)" }} />
-          <div style={{ fontSize: 36, marginBottom: 8 }}>🌟</div>
-          <h2 style={{ fontWeight: 900, fontSize: 22, marginBottom: 8 }}>
-            Ready to shine?
-          </h2>
-          <p style={{ fontSize: 14, fontWeight: 700, opacity: 0.9, marginBottom: 16 }}>
-            Create your free profile and get personalised recommendations!
-          </p>
-          <button
-            onClick={() => navigate("/signup")}
-            style={{
-              background: "white",
-              color: "#e91e8c",
-              border: "none",
-              borderRadius: 20,
-              padding: "11px 28px",
+          {/* Decorative background elements */}
+          <div style={{ position: "absolute", top: -40, left: -40, width: 140, height: 140, borderRadius: "50%", background: "rgba(255,255,255,0.05)" }} />
+          <div style={{ position: "absolute", bottom: -40, right: -40, width: 140, height: 140, borderRadius: "50%", background: "rgba(255,255,255,0.05)" }} />
+          
+          <div style={{ fontSize: 32, marginBottom: 12, animation: "float 3s ease-in-out infinite" }}>✨ Inspiring Words ✨</div>
+          
+          <div style={{ minHeight: "90px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+            <p style={{
               fontFamily: "'Nunito', sans-serif",
-              fontWeight: 900,
-              fontSize: 15,
+              fontSize: 18,
+              fontWeight: 800,
+              fontStyle: "italic",
+              lineHeight: 1.6,
+              marginBottom: 10,
+              maxWidth: 600,
+              margin: "0 auto 10px",
+              opacity: 0.95
+            }}>
+              "{QUOTES[quoteIndex].text}"
+            </p>
+            <p style={{
+              fontSize: 14,
+              fontWeight: 700,
+              color: "#e3f0ff",
+              letterSpacing: 0.5
+            }}>
+              — {QUOTES[quoteIndex].author}
+            </p>
+          </div>
+
+          <button
+            onClick={nextQuote}
+            style={{
+              marginTop: 18,
+              background: "rgba(255, 255, 255, 0.15)",
+              color: "white",
+              border: "2px solid rgba(255, 255, 255, 0.3)",
+              borderRadius: 20,
+              padding: "8px 24px",
+              fontFamily: "'Nunito', sans-serif",
+              fontWeight: 800,
+              fontSize: 13,
               cursor: "pointer",
-              boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
-              transition: "transform 0.18s",
+              backdropFilter: "blur(4px)",
+              transition: "all 0.2s ease",
             }}
-            onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"}
-            onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = "white";
+              e.currentTarget.style.color = "#1565c0";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = "rgba(255, 255, 255, 0.15)";
+              e.currentTarget.style.color = "white";
+            }}
           >
-            Get Started — It's Free! 🚀
+            Inspire Me More 🔄
           </button>
+        </div>
+      </section>
+
+      {/* ── Connect with Me Footer Tab ── */}
+      <section style={{ padding: "0 1.5rem 2.5rem", textAlign: "center" }}>
+        <div style={{
+          background: "white",
+          border: "2px solid #e3f0ff",
+          borderRadius: 24,
+          padding: "2rem 1.5rem",
+          boxShadow: "0 8px 32px rgba(21, 101, 192, 0.05)",
+        }}>
+          <h3 style={{
+            fontFamily: "'Nunito', sans-serif",
+            fontWeight: 900,
+            fontSize: 18,
+            color: "#1a237e",
+            marginBottom: 4,
+          }}>
+            🤝 Connect with Me
+          </h3>
+          <p style={{ fontSize: 13, color: "#7986cb", fontWeight: 700, marginBottom: 20 }}>
+            Let's build something amazing together!
+          </p>
+
+          <div style={{
+            display: "flex",
+            justifyContent: "center",
+            flexWrap: "wrap",
+            gap: 12,
+          }}>
+            {[
+              { label: "GitHub", href: "https://github.com/Dharssigakathirvel", emoji: "🐙", color: "#24292e", hoverBg: "#f6f8fa" },
+              { label: "LeetCode", href: "https://leetcode.com/Dharssigakathirvel", emoji: "💻", color: "#ffa116", hoverBg: "#fff9f0" },
+              { label: "LinkedIn", href: "https://www.linkedin.com/in/dharssigakathirvel", emoji: "💼", color: "#0077b5", hoverBg: "#f0f7fa" },
+              { label: "Email", href: "mailto:dharssigakathirvel@gmail.com", emoji: "📧", color: "#e91e8c", hoverBg: "#fdf0f6" }
+            ].map(social => (
+              <a
+                key={social.label}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="card-hover"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  textDecoration: "none",
+                  border: `2px solid ${social.color}33`,
+                  borderRadius: 16,
+                  padding: "10px 20px",
+                  fontSize: 14,
+                  fontWeight: 800,
+                  color: social.color,
+                  transition: "all 0.2s ease",
+                  background: "white"
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = social.color;
+                  e.currentTarget.style.background = social.hoverBg;
+                  e.currentTarget.style.transform = "translateY(-3px)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = `${social.color}33`;
+                  e.currentTarget.style.background = "white";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                <span>{social.emoji}</span>
+                <span>{social.label}</span>
+              </a>
+            ))}
+          </div>
         </div>
       </section>
     </div>
