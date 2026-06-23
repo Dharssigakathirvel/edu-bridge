@@ -33,6 +33,102 @@ export default function Home() {
   const [quoteIndex, setQuoteIndex] = useState(0);
   const [flipping, setFlipping] = useState(false);
 
+  // Hogwarts Sorting Hat Quiz State
+  const [hatStep, setHatStep] = useState(0); // 0 = intro, 1-3 = Qs, 4 = Result
+  const [points, setPoints] = useState({ Codedor: 0, Mathclaw: 0, Artpuff: 0, Scitherin: 0 });
+  const [finalHouse, setFinalHouse] = useState(null);
+
+  const quizQuestions = [
+    {
+      q: "Which magical item calls out to you?",
+      options: [
+        { text: "⌨️ A glowing keyboard of infinite commands", house: "Codedor" },
+        { text: "🧮 An ancient scroll of mathematical proofs", house: "Mathclaw" },
+        { text: "🎨 A canvas that brings illustrations to life", house: "Artpuff" },
+        { text: "🧪 A vial of secret, boiling scientific elements", house: "Scitherin" }
+      ]
+    },
+    {
+      q: "When faced with a dark forest of bugs, you...",
+      options: [
+        { text: "🦁 Brave the danger and start hacking the path", house: "Codedor" },
+        { text: "🦅 Map out the coordinates and calculate the safest exit", house: "Mathclaw" },
+        { text: "🦡 Gather allies and paint glowing markers on trees", house: "Artpuff" },
+        { text: "🐍 Study the venomous plants to extract their power", house: "Scitherin" }
+      ]
+    },
+    {
+      q: "What is your ultimate magical ambition?",
+      options: [
+        { text: "⚡ To build legendary artifacts and websites", house: "Codedor" },
+        { text: "🔍 To unlock the fundamental secrets of the universe", house: "Mathclaw" },
+        { text: "🎨 To inspire others and bring beauty to the world", house: "Artpuff" },
+        { text: "🧪 To master elements and rule over complex systems", house: "Scitherin" }
+      ]
+    }
+  ];
+
+  const housesInfo = {
+    Codedor: {
+      name: "Code-dor 🦁",
+      desc: "Bravery, daring, and chivalry! You command lines of code and build the future with software wizardry.",
+      color: "#ffd700",
+      bg: "#3a060d",
+      borderColor: "#ffd700",
+      icon: "🦁💻"
+    },
+    Mathclaw: {
+      name: "Math-claw 🦅",
+      desc: "Intelligence, curiosity, and logic! You decode the secret patterns of the universe using mathematics.",
+      color: "#90caf9",
+      bg: "#07162b",
+      borderColor: "#90caf9",
+      icon: "🦅🧮"
+    },
+    Artpuff: {
+      name: "Art-puff 🦡",
+      desc: "Patience, loyalty, and playfulness! You decorate the magical world with color, music, and boundless creativity.",
+      color: "#ffd54f",
+      bg: "#241f0f",
+      borderColor: "#ffd54f",
+      icon: "🦡🎨"
+    },
+    Scitherin: {
+      name: "Sci-therin 🐍",
+      desc: "Ambition, resourcefulness, and cleverness! You analyze complex experiments and master scientific logic.",
+      color: "#a5d6a7",
+      bg: "#051e0e",
+      borderColor: "#a5d6a7",
+      icon: "🐍🔬"
+    }
+  };
+
+  function handleAnswer(house) {
+    const updatedPoints = { ...points, [house]: points[house] + 1 };
+    setPoints(updatedPoints);
+    if (hatStep < quizQuestions.length) {
+      setHatStep(hatStep + 1);
+    } else {
+      // Determine house with max points
+      let maxHouse = "Codedor";
+      let maxVal = -1;
+      for (const [h, val] of Object.entries(updatedPoints)) {
+        if (val > maxVal) {
+          maxVal = val;
+          maxHouse = h;
+        }
+      }
+      setFinalHouse(maxHouse);
+      setHatStep(4);
+    }
+  }
+
+  function resetQuiz() {
+    setHatStep(0);
+    setPoints({ Codedor: 0, Mathclaw: 0, Artpuff: 0, Scitherin: 0 });
+    setFinalHouse(null);
+  }
+
   function nextQuote() {
     setFlipping(true);
     setTimeout(() => {
@@ -351,77 +447,126 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Connect with Me ── */}
+      {/* ── Sorting Hat Section (Kid Interesting Feature) ── */}
       <section style={{ padding: "0 1.5rem 2.5rem", textAlign: "center" }}>
         <div style={{
-          background: "linear-gradient(135deg, #fff9f0 0%, #fff0f7 100%)",
-          border: "2px solid #fce4ef",
+          background: "linear-gradient(135deg, #160e25 0%, #291a3c 100%)",
+          border: "2px solid var(--pink)",
           borderRadius: 28,
           padding: "2.5rem 1.5rem",
-          boxShadow: "0 8px 32px rgba(233, 30, 140, 0.07)",
+          boxShadow: "var(--shadow-md)",
+          color: "#f6ebd4",
+          position: "relative",
+          overflow: "hidden"
         }}>
-          <div style={{ fontSize: 36, marginBottom: 6 }}>🤝</div>
-          <h3 style={{
-            fontFamily: "'Nunito', sans-serif",
-            fontWeight: 900,
-            fontSize: 20,
-            background: "linear-gradient(135deg,#e91e8c,#1565c0)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            marginBottom: 4,
-          }}>
-            Connect with Me
-          </h3>
-          <p style={{ fontSize: 13, color: "#7986cb", fontWeight: 700, marginBottom: 24 }}>
-            Built with ❤️ by Dharssiga &mdash; let's connect!
-          </p>
+          {/* Sparkles */}
+          <div style={{ position: "absolute", top: 12, right: 16, fontSize: 24, animation: "float 4s infinite" }}>🧙‍♂️</div>
+          <div style={{ position: "absolute", bottom: 12, left: 16, fontSize: 24, animation: "float 3s infinite" }}>✨</div>
 
-          <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 14 }}>
-            {[
-              { label: "GitHub",   href: "https://github.com/Dharssigakathirvel",                         emoji: "🐙", bg: "#24292e", light: "#f6f8fa" },
-              { label: "LeetCode", href: "https://leetcode.com/u/Dharssigakathirvel/",                    emoji: "💻", bg: "#ffa116", light: "#fff9f0" },
-              { label: "LinkedIn", href: "https://www.linkedin.com/in/dharssiga-kathirvel-0aa5b5326/",   emoji: "💼", bg: "#0077b5", light: "#f0f7fb" },
-              { label: "Email",    href: "mailto:dharssigakathirvel@gmail.com",                            emoji: "📧", bg: "#e91e8c", light: "#fdf0f6" },
-            ].map((s) => (
-              <a
-                key={s.label}
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 10,
-                  textDecoration: "none",
-                  background: "white",
-                  border: `2px solid ${s.bg}22`,
-                  borderRadius: 18,
-                  padding: "12px 22px",
-                  fontSize: 14,
-                  fontWeight: 900,
-                  color: s.bg,
-                  fontFamily: "'Nunito', sans-serif",
-                  transition: "all 0.22s cubic-bezier(.4,0,.2,1)",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = s.light;
-                  e.currentTarget.style.borderColor = s.bg;
-                  e.currentTarget.style.transform = "translateY(-4px) scale(1.04)";
-                  e.currentTarget.style.boxShadow = `0 8px 20px ${s.bg}30`;
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = "white";
-                  e.currentTarget.style.borderColor = `${s.bg}22`;
-                  e.currentTarget.style.transform = "translateY(0) scale(1)";
-                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.04)";
-                }}
-              >
-                <span style={{ fontSize: 20 }}>{s.emoji}</span>
-                {s.label}
-              </a>
-            ))}
-          </div>
+          {hatStep === 0 && (
+            <div>
+              <div style={{ fontSize: 64, marginBottom: 8, animation: "float 3s ease-in-out infinite" }}>🎩</div>
+              <h3 style={{
+                fontFamily: "'Cinzel Decorative', serif",
+                fontSize: 22,
+                color: "var(--pink)",
+                marginBottom: 8,
+                letterSpacing: 1
+              }}>
+                The Hogwarts Sorting Hat
+              </h3>
+              <p style={{ fontSize: 14, color: "#dfd2b5", fontWeight: 700, maxWidth: 500, margin: "0 auto 24px", lineHeight: 1.6 }}>
+                Ah, step forward young learner! Let the Sorting Hat read your magical talents and assign you to one of the legendary Houses of Learning!
+              </p>
+              <button className="btn-primary" onClick={() => setHatStep(1)}>
+                Put on the Sorting Hat 🪄
+              </button>
+            </div>
+          )}
+
+          {hatStep > 0 && hatStep <= 3 && (
+            <div>
+              <span style={{ fontSize: 11, fontWeight: 900, color: "var(--pink)", letterSpacing: 2 }}>QUESTION {hatStep} OF 3</span>
+              <h4 style={{
+                fontFamily: "'Cinzel Decorative', serif",
+                fontSize: 18,
+                marginTop: 8,
+                marginBottom: 20,
+                color: "white"
+              }}>
+                {quizQuestions[hatStep - 1].q}
+              </h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 420, margin: "0 auto" }}>
+                {quizQuestions[hatStep - 1].options.map((opt, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleAnswer(opt.house)}
+                    style={{
+                      background: "rgba(255, 255, 255, 0.05)",
+                      border: "2px solid rgba(212, 175, 55, 0.2)",
+                      borderRadius: 16,
+                      padding: "14px 20px",
+                      textAlign: "left",
+                      color: "#f7edd4",
+                      fontFamily: "'Nunito', sans-serif",
+                      fontWeight: 800,
+                      fontSize: 14,
+                      cursor: "pointer",
+                      transition: "all 0.2s"
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = "rgba(212, 175, 55, 0.1)";
+                      e.currentTarget.style.borderColor = "var(--pink)";
+                      e.currentTarget.style.transform = "translateX(4px)";
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                      e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.2)";
+                      e.currentTarget.style.transform = "translateX(0)";
+                    }}
+                  >
+                    {opt.text}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {hatStep === 4 && finalHouse && (
+            <div className="animate-bounce-in">
+              <div style={{ fontSize: 72, marginBottom: 8 }}>{housesInfo[finalHouse].icon}</div>
+              <span style={{ fontSize: 11, fontWeight: 900, color: "var(--pink)", letterSpacing: 2 }}>YOU HAVE BEEN SORTED INTO...</span>
+              <h3 style={{
+                fontFamily: "'Cinzel Decorative', serif",
+                fontSize: 26,
+                color: housesInfo[finalHouse].color,
+                marginTop: 6,
+                marginBottom: 12
+              }}>
+                {housesInfo[finalHouse].name}
+              </h3>
+              <div style={{
+                background: housesInfo[finalHouse].bg,
+                border: `2px solid ${housesInfo[finalHouse].borderColor}`,
+                borderRadius: 20,
+                padding: "20px",
+                maxWidth: 450,
+                margin: "0 auto 24px"
+              }}>
+                <p style={{ fontSize: 14, color: "#fff6df", fontWeight: 700, lineHeight: 1.6 }}>
+                  {housesInfo[finalHouse].desc}
+                </p>
+              </div>
+              <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+                <button className="btn-primary" onClick={resetQuiz}>
+                  Sort Again 🔄
+                </button>
+                <button className="btn-secondary" onClick={() => navigate("/opportunities")}>
+                  Explore Opportunities 🏰
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </div>

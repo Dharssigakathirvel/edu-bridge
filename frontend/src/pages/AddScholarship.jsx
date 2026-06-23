@@ -21,7 +21,7 @@ export default function AddScholarship() {
   }
 
   const [tab, setTab]         = useState("add"); // "add" | "manage"
-  const [form, setForm]       = useState({ name:"", description:"", class:"", minPercentage:"", state:"", officialLink:"", deadline:"" });
+  const [form, setForm]       = useState({ title:"", description:"", type:"Scholarship", emoji:"🎓", class:"", minMarks:"", interest:"All", deadline:"" });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError]     = useState("");
@@ -34,13 +34,29 @@ export default function AddScholarship() {
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true); setError(""); setSuccess("");
+    
+    // Parse class range from string input like "8-12" or "10"
+    let classRange = [8, 9, 10, 11, 12];
+    const rangeMatch = form.class.match(/(\d+)\s*[-–—]\s*(\d+)/);
+    if (rangeMatch) {
+      const start = parseInt(rangeMatch[1]);
+      const end = parseInt(rangeMatch[2]);
+      classRange = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    } else {
+      const single = parseInt(form.class.replace(/\D/g, ""));
+      if (!isNaN(single)) {
+        classRange = [single];
+      }
+    }
+
     try {
       const res = await API.post("/scholarships/add", {
         ...form,
-        minPercentage: Number(form.minPercentage),
+        minMarks: Number(form.minMarks),
+        classRange,
       });
       setSuccess(res.data.message || "Scholarship added! 🎉");
-      setForm({ name:"", description:"", class:"", minPercentage:"", state:"", officialLink:"", deadline:"" });
+      setForm({ title:"", description:"", type:"Scholarship", emoji:"🎓", class:"", minMarks:"", interest:"All", deadline:"" });
     } catch (err) {
       setError(err.response?.data?.message || "Failed to add ❌");
     } finally {
@@ -49,12 +65,13 @@ export default function AddScholarship() {
   }
 
   const fields = [
-    { name:"name",          placeholder:"Scholarship / Competition Name 🎓", type:"text",   required:true },
+    { name:"title",         placeholder:"Scholarship / Competition Title 🎓", type:"text",   required:true },
+    { name:"type",          placeholder:"Type 🏷️",                          type:"select", options: ["Scholarship", "Hackathon", "Competition", "Coding"], required:true },
+    { name:"emoji",         placeholder:"Emoji Icon (e.g. 🎓) ✨",           type:"text",   required:true },
     { name:"description",   placeholder:"Short Description 📝",              type:"text",   required:true },
-    { name:"class",         placeholder:"Eligible Class (e.g. 10 or All) 📚",type:"text",   required:true },
-    { name:"minPercentage", placeholder:"Minimum Percentage % 🏆",           type:"number", required:true },
-    { name:"state",         placeholder:"State (or All) 📍",                 type:"text",   required:false },
-    { name:"officialLink",  placeholder:"Official Link 🔗",                  type:"url",    required:false },
+    { name:"class",         placeholder:"Eligible Class (e.g. Class 8–12) 📚",type:"text",   required:true },
+    { name:"minMarks",      placeholder:"Minimum Marks/Percentage % 🏆",    type:"number", required:true },
+    { name:"interest",      placeholder:"Interest Area (e.g. Coding, Math, Science, All) 🎨", type:"text", required:true },
     { name:"deadline",      placeholder:"Deadline (e.g. 30 July 2026) ⏳",   type:"text",   required:true },
   ];
 
@@ -126,7 +143,21 @@ export default function AddScholarship() {
             )}
 
             <form onSubmit={handleSubmit}>
-              {fields.map(f => (
+              {fields.map(f => f.type === "select" ? (
+                <div key={f.name} style={{ marginBottom: 12 }}>
+                  <label style={{ fontSize: 12, fontWeight: 800, color: "#1a237e", display: "block", marginBottom: 4 }}>{f.placeholder}</label>
+                  <select
+                    className="input"
+                    name={f.name}
+                    value={form[f.name]}
+                    onChange={handleChange}
+                    required={f.required}
+                    style={{ width: "100%", padding: "12px", border: "2px solid #e3f0ff", borderRadius: 12, outline: "none", appearance: "auto" }}
+                  >
+                    {f.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                  </select>
+                </div>
+              ) : (
                 <input
                   key={f.name}
                   className="input"
@@ -136,8 +167,9 @@ export default function AddScholarship() {
                   value={form[f.name]}
                   onChange={handleChange}
                   required={f.required}
-                  min={f.name==="minPercentage" ? 0 : undefined}
-                  max={f.name==="minPercentage" ? 100 : undefined}
+                  min={f.name==="minMarks" ? 0 : undefined}
+                  max={f.name==="minMarks" ? 100 : undefined}
+                  style={{ marginBottom: 12 }}
                 />
               ))}
               <button type="submit" className="btn-primary"

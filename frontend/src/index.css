@@ -1,25 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Macondo&family=Nunito:wght@400;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── Tokens ─────────────────────────────────────────── */
+/* ── Magical Harry Potter Tokens ───────────────────────── */
 :root {
-  --pink:       #e91e8c;
-  --pink-light: #fce4ef;
-  --pink-pale:  #fdf4f8;
-  --blue:       #1565c0;
-  --blue-light: #e3f0ff;
-  --blue-mid:   #5c6bc0;
-  --navy:       #1a237e;
-  --white:      #ffffff;
-  --grad:       linear-gradient(135deg, #e91e8c, #1565c0);
-  --grad-soft:  linear-gradient(135deg, #fce4ef 0%, #e3f0ff 100%);
+  --pink:       #d4af37; /* Gold */
+  --pink-light: #2e1a2f; /* Dark Purple-burgundy */
+  --pink-pale:  #0a060f; /* Near black */
+  --blue:       #8a70d6; /* Magic violet */
+  --blue-light: #160e1f;
+  --blue-mid:   #5b408c;
+  --navy:       #f3e5ab; /* Gold-parchment text */
+  --white:      #130c1d; /* Dark card color */
+  --grad:       linear-gradient(135deg, #740001, #d4af37); /* Gryffindor Burgundy & Gold */
+  --grad-soft:  linear-gradient(135deg, #170d24 0%, #0a060f 100%);
   --radius-sm:  12px;
   --radius-md:  20px;
   --radius-lg:  28px;
-  --shadow-sm:  0 2px 12px rgba(233,30,140,0.10);
-  --shadow-md:  0 4px 24px rgba(21,101,192,0.13);
+  --shadow-sm:  0 2px 14px rgba(212,175,55,0.15);
+  --shadow-md:  0 8px 32px rgba(212,175,55,0.25);
+  
+  --parchment:  #f6ebd4;
+  --parchment-dark: #dfd2b5;
 }
 
 /* ── Reset & Base ────────────────────────────────────── */
@@ -30,64 +33,87 @@ html { scroll-behavior: smooth; }
 body {
   font-family: 'Nunito', sans-serif;
   background: var(--pink-pale);
-  color: var(--navy);
+  color: #f7edd4;
   min-height: 100vh;
   overflow-x: hidden;
+  /* Add magical sparkle dust simulation */
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 1px, transparent 1px),
+    radial-gradient(circle at 75% 40%, rgba(255,255,255,0.15) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 40% 80%, rgba(212,175,55,0.1) 1.2px, transparent 1.2px),
+    radial-gradient(circle at 90% 10%, rgba(212,175,55,0.15) 2px, transparent 2px);
+  background-size: 400px 400px;
 }
 
-/* ── Input utility ───────────────────────────────────── */
+/* Header typography */
+h1, h2, h3, .magic-title {
+  font-family: 'Cinzel Decorative', serif !important;
+  text-shadow: 0 2px 10px rgba(212, 175, 55, 0.4);
+}
+
+/* Override inputs to match parchment style */
 .input {
   display: block;
   width: 100%;
   padding: 13px 18px;
   margin-top: 14px;
   border-radius: var(--radius-md);
-  border: 2px solid #f3e5f5;
+  border: 2px solid var(--pink);
   font-family: 'Nunito', sans-serif;
   font-size: 14px;
   font-weight: 700;
-  color: var(--navy);
-  background: var(--pink-pale);
+  color: #2c1a04;
+  background: var(--parchment);
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: all 0.22s ease;
 }
 .input:focus {
-  border-color: var(--pink);
-  box-shadow: 0 0 0 3px rgba(233,30,140,0.12);
+  border-color: #ffd700;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
   background: white;
+  transform: translateY(-2px);
 }
-.input::placeholder { color: #b0bec5; font-weight: 600; }
+.input::placeholder { color: #8e7355; font-weight: 600; }
 
 /* ── Buttons ─────────────────────────────────────────── */
 .btn-primary {
-  background: var(--grad);
-  color: white;
-  border: none;
+  background: linear-gradient(135deg, #4a0e17, #740001) !important;
+  color: var(--parchment) !important;
+  border: 2px solid var(--pink) !important;
   border-radius: var(--radius-lg);
   padding: 13px 32px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 15px;
-  font-weight: 800;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 13px;
+  font-weight: 900;
   cursor: pointer;
-  box-shadow: 0 4px 18px rgba(233,30,140,0.30);
-  transition: transform 0.18s, box-shadow 0.18s;
+  box-shadow: 0 4px 18px rgba(116, 0, 0, 0.4);
+  transition: all 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-.btn-primary:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 28px rgba(233,30,140,0.38); }
+.btn-primary:hover { 
+  transform: translateY(-3px) scale(1.05); 
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.5); 
+  border-color: #ffd700 !important;
+}
 .btn-primary:active { transform: scale(0.97); }
 
 .btn-secondary {
-  background: white;
-  color: var(--blue);
-  border: 2.5px solid var(--blue);
+  background: var(--parchment) !important;
+  color: #4a0e17 !important;
+  border: 2.5px solid #4a0e17 !important;
   border-radius: var(--radius-lg);
   padding: 13px 32px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 15px;
-  font-weight: 800;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 13px;
+  font-weight: 900;
   cursor: pointer;
-  transition: background 0.18s, transform 0.18s;
+  transition: all 0.22s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
 }
-.btn-secondary:hover { background: var(--blue-light); transform: translateY(-2px); }
+.btn-secondary:hover { 
+  background: var(--parchment-dark) !important; 
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2);
+}
 
 /* ── Animations ──────────────────────────────────────── */
 @keyframes float {
@@ -99,13 +125,9 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes pulse-ring {
-  0%   { box-shadow: 0 0 0 0 rgba(233,30,140,0.25); }
-  70%  { box-shadow: 0 0 0 10px rgba(233,30,140,0); }
-  100% { box-shadow: 0 0 0 0 rgba(233,30,140,0); }
-}
-@keyframes shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position:  200% center; }
+  0%   { box-shadow: 0 0 0 0 rgba(212,175,55,0.3); }
+  70%  { box-shadow: 0 0 0 10px rgba(212,175,55,0); }
+  100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); }
 }
 @keyframes spin-slow {
   from { transform: rotate(0deg); }
@@ -127,13 +149,17 @@ body {
 .stagger > *:nth-child(3) { animation-delay: 0.19s; }
 .stagger > *:nth-child(4) { animation-delay: 0.26s; }
 
-/* ── Card hover ──────────────────────────────────────── */
+/* ── Card hover override ──────────────────────────────── */
 .card-hover {
-  transition: transform 0.22s, box-shadow 0.22s;
+  background: var(--white) !important;
+  border: 2px solid var(--pink-light) !important;
+  color: #f7edd4 !important;
+  transition: all 0.25s ease;
 }
 .card-hover:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-6px) scale(1.03);
+  border-color: var(--pink) !important;
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.3) !important;
 }
 
 /* ── Gradient text ───────────────────────────────────── */
@@ -144,9 +170,8 @@ body {
   background-clip: text;
 }
 
-/* ── Page wrapper (accounts for bottom mobile nav) ───── */
 .page-wrap {
-  padding-bottom: 80px; /* space for mobile bottom nav */
+  padding-bottom: 80px;
 }
 
 @media (min-width: 768px) {
@@ -154,9 +179,9 @@ body {
 }
 
 /* ── Scrollbar ───────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--pink-pale); }
-::-webkit-scrollbar-thumb { background: var(--pink-light); border-radius: 6px; }
+::-webkit-scrollbar-thumb { background: #3b224c; border-radius: 6px; border: 2px solid var(--pink-pale); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

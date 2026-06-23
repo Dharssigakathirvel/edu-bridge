@@ -1,16 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
 import OpportunityCard from "../components/OpportunityCard.jsx";
-import opportunities from "../data/opportunities.js";
+import API from "../api";
 
 const CATEGORIES = ["All", "Scholarship", "Hackathon", "Competition", "Coding"];
 
 export default function Opportunities() {
   const [search, setSearch]     = useState("");
   const [category, setCategory] = useState("All");
+  const [opportunities, setOpportunities] = useState([]);
+  const [loading, setLoading]   = useState(true);
+
+  useEffect(() => {
+    async function fetchOpps() {
+      try {
+        const res = await API.get("/scholarships");
+        setOpportunities(res.data.scholarships || res.data || []);
+      } catch (err) {
+        console.error("Failed to fetch scholarships", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchOpps();
+  }, []);
 
   const filtered = opportunities.filter(item => {
-    const matchSearch   = item.title.toLowerCase().includes(search.toLowerCase());
+    const matchSearch   = (item.title || "").toLowerCase().includes(search.toLowerCase());
     const matchCategory = category === "All" || item.type === category;
     return matchSearch && matchCategory;
   });
@@ -129,18 +145,25 @@ export default function Opportunities() {
       </div>
 
       {/* Grid */}
-      <div style={{
-        padding: "1.5rem",
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-        gap: 16,
-      }}>
-        {filtered.map((item, i) => (
-          <div key={item.id} style={{ animationDelay: `${i * 0.08}s` }}>
-            <OpportunityCard item={item} />
-          </div>
-        ))}
-      </div>
+      {loading ? (
+        <div style={{ textAlign: "center", padding: "3rem" }}>
+          <div style={{ fontSize: 40, animation: "float 1s ease-in-out infinite" }}>⏳</div>
+          <p style={{ fontWeight: 800, color: "#7986cb", marginTop: 8 }}>Loading opportunities...</p>
+        </div>
+      ) : (
+        <div style={{
+          padding: "1.5rem",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+          gap: 16,
+        }}>
+          {filtered.map((item, i) => (
+            <div key={item.id} style={{ animationDelay: `${i * 0.08}s` }}>
+              <OpportunityCard item={item} />
+            </div>
+          ))}
+        </div>
+      )}
 
       {filtered.length === 0 && (
         <div style={{ textAlign: "center", padding: "3rem 1rem" }}>

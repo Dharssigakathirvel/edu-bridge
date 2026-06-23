@@ -295,15 +295,16 @@ function CodeFill(){
   );
 }
 
-// ── GAME 5: Tic Tac Toe (2-player) ─────────────────────────────────
+// ── GAME 5: Tic Tac Toe (vs Computer) ──────────────────────────────
 const WINS = [
   [0,1,2],[3,4,5],[6,7,8], // rows
   [0,3,6],[1,4,7],[2,5,8], // cols
   [0,4,8],[2,4,6],         // diagonals
 ];
+
 function TicTacToe(){
   const [board, setBoard] = useState(Array(9).fill(null));
-  const [xTurn, setXTurn] = useState(true);
+  const [xTurn, setXTurn] = useState(true); // Player is X (always true turn first)
   const [winLine, setWinLine] = useState(null);
 
   function getWinner(b){
@@ -315,35 +316,91 @@ function TicTacToe(){
   }
 
   function click(i){
-    if(board[i] || winLine) return;
+    if(board[i] || winLine || !xTurn) return;
     const next = board.slice();
-    next[i] = xTurn ? "X" : "O";
-    const result = getWinner(next);
+    next[i] = "X";
     setBoard(next);
-    setXTurn(!xTurn);
-    if(result) setWinLine(result);
+    setXTurn(false);
+    const result = getWinner(next);
+    if(result) {
+      setWinLine(result);
+    }
   }
+
+  // Computer AI move effect
+  useEffect(() => {
+    if (xTurn || winLine) return;
+    
+    const timer = setTimeout(() => {
+      const emptyCells = board.map((val, idx) => val === null ? idx : null).filter(val => val !== null);
+      if (emptyCells.length === 0) return;
+      
+      let choice = null;
+      // 1. Try to win or block
+      for (const checkMark of ["O", "X"]) {
+        for (const [a, b, c] of WINS) {
+          const vals = [board[a], board[b], board[c]];
+          const emptyCount = vals.filter(v => v === null).length;
+          const markCount = vals.filter(v => v === checkMark).length;
+          if (emptyCount === 1 && markCount === 2) {
+            if (board[a] === null) choice = a;
+            else if (board[b] === null) choice = b;
+            else if (board[c] === null) choice = c;
+            break;
+          }
+        }
+        if (choice !== null) break;
+      }
+      
+      // 2. Take center if available
+      if (choice === null && board[4] === null) {
+        choice = 4;
+      }
+      
+      // 3. Take random corner
+      if (choice === null) {
+        const corners = [0, 2, 6, 8].filter(c => board[c] === null);
+        if (corners.length > 0) {
+          choice = corners[Math.floor(Math.random() * corners.length)];
+        }
+      }
+
+      // 4. Random choice
+      if (choice === null) {
+        choice = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+      }
+
+      const next = board.slice();
+      next[choice] = "O";
+      setBoard(next);
+      setXTurn(true);
+      const result = getWinner(next);
+      if (result) setWinLine(result);
+    }, 450);
+
+    return () => clearTimeout(timer);
+  }, [xTurn, board, winLine]);
 
   function reset(){ setBoard(Array(9).fill(null)); setXTurn(true); setWinLine(null); }
 
   const result = winLine;
   const cellColors = {
-    X: "linear-gradient(135deg,#e91e8c,#c2185b)",
-    O: "linear-gradient(135deg,#1565c0,#1a237e)",
-    null: "linear-gradient(135deg,#fce4ef,#e3f0ff)",
+    X: "linear-gradient(135deg,#740001,#ae0001)",
+    O: "linear-gradient(135deg,#1b102b,#d4af37)",
+    null: "linear-gradient(135deg,#2e1a2f,#160e1f)",
   };
 
   return (
-    <div style={{ background:"white", borderRadius:24, padding:"1.5rem", border:"2px solid #e3f0ff" }}>
+    <div style={{ background:"#130c1d", borderRadius:24, padding:"1.5rem", border:"2px solid var(--pink)" }}>
       <div style={{ display:"flex", justifyContent:"space-between", marginBottom:12, alignItems:"center" }}>
-        <span style={{ fontSize:11, fontWeight:800, color:"#7986cb" }}>⭕ Tic Tac Toe</span>
+        <span style={{ fontSize:11, fontWeight:800, color:"var(--pink)" }}>⭕ Tic Tac Toe</span>
         {result ? (
-          <span style={{ fontSize:12, fontWeight:900, color: result.winner==="Draw"?"#ff6f00":"#e91e8c" }}>
-            {result.winner==="Draw" ? "🤝 It's a Draw!" : `🏆 Player ${result.winner} Wins!`}
+          <span style={{ fontSize:12, fontWeight:900, color: result.winner==="Draw"?"#ff6f00":"var(--pink)" }}>
+            {result.winner==="Draw" ? "🤝 It's a Draw!" : (result.winner === "X" ? "🏆 You Win! 🎉" : "😢 Computer Wins!")}
           </span>
         ) : (
-          <span style={{ fontSize:12, fontWeight:800, color: xTurn?"#e91e8c":"#1565c0" }}>
-            {xTurn ? "🔴 X's Turn" : "🔵 O's Turn"}
+          <span style={{ fontSize:12, fontWeight:800, color: xTurn?"var(--pink)":"#8a70d6" }}>
+            {xTurn ? "⚡ Your Turn (X)" : "🧙‍♂️ Computer is thinking... (O)"}
           </span>
         )}
       </div>
@@ -354,15 +411,15 @@ function TicTacToe(){
           return (
             <div key={i} onClick={()=>click(i)} style={{
               height:80, borderRadius:16,
-              background: isWinCell ? "linear-gradient(135deg,#43a047,#2e7d32)" : cellColors[val],
+              background: isWinCell ? "linear-gradient(135deg,#2e7d32,#43a047)" : cellColors[val],
               display:"flex", alignItems:"center", justifyContent:"center",
-              fontSize:36, fontWeight:900, cursor: val||result?"default":"pointer",
-              color: val==="X"?"white" : val==="O"?"white" : "transparent",
-              border: isWinCell?"3px solid #43a047":"2px solid transparent",
+              fontSize:36, fontWeight:900, cursor: val||result||!xTurn?"default":"pointer",
+              color: val==="X"?"#fff6df" : val==="O"?"#ffd700" : "transparent",
+              border: isWinCell?"3px solid #ffd700":"2px solid var(--pink-light)",
               transition:"all 0.2s ease",
               transform: isWinCell?"scale(1.08)":"scale(1)",
               userSelect:"none",
-              boxShadow: val ? "0 4px 12px rgba(0,0,0,0.12)" : "none",
+              boxShadow: val ? "0 4px 12px rgba(0,0,0,0.3)" : "none",
             }}>
               {val || "·"}
             </div>
@@ -372,23 +429,285 @@ function TicTacToe(){
 
       <button onClick={reset} style={{
         width:"100%", marginTop:4,
-        background:"linear-gradient(135deg,#fce4ef,#e3f0ff)",
-        border:"2px solid #e3f0ff", borderRadius:14,
-        padding:"10px", fontFamily:"'Nunito',sans-serif",
-        fontWeight:800, fontSize:13, color:"#1a237e", cursor:"pointer",
+        background:"var(--parchment)",
+        border:"2px solid var(--pink)", borderRadius:14,
+        padding:"10px", fontFamily:"'Cinzel Decorative',serif",
+        fontWeight:800, fontSize:12, color:"#4a0e17", cursor:"pointer",
         transition:"background 0.2s",
-      }}>🔄 New Game</button>
+      }}>🔄 Reset Board</button>
+    </div>
+  );
+}
+
+// ── GAME 6: Broom Racer (Canvas) ──────────────────────────────────
+function BroomRacing() {
+  const [score, setScore] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [highScore, setHighScore] = useState(() => Number(localStorage.getItem("broomBest") || 0));
+  
+  const canvasRef = useRef(null);
+  const stateRef = useRef({
+    x: 135,
+    obstacles: [],
+    snitches: [],
+    keys: {},
+    score: 0,
+    lastSpawn: 0,
+    lastSnitchSpawn: 0,
+    speed: 3
+  });
+
+  const reset = () => {
+    stateRef.current = {
+      x: 135,
+      obstacles: [],
+      snitches: [],
+      keys: {},
+      score: 0,
+      lastSpawn: 0,
+      lastSnitchSpawn: 0,
+      speed: 3
+    };
+    setScore(0);
+    setGameOver(false);
+    setIsPlaying(true);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (["ArrowLeft", "ArrowRight"].includes(e.key)) {
+        e.preventDefault();
+      }
+      stateRef.current.keys[e.key] = true;
+    };
+    const handleKeyUp = (e) => {
+      stateRef.current.keys[e.key] = false;
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isPlaying || gameOver) return;
+    
+    let animId;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    
+    const update = () => {
+      const state = stateRef.current;
+      
+      if (state.keys["ArrowLeft"] && state.x > 10) state.x -= 5;
+      if (state.keys["ArrowRight"] && state.x < 260) state.x += 5;
+      
+      state.obstacles.forEach(o => o.y += state.speed);
+      state.snitches.forEach(s => s.y += state.speed - 1);
+      
+      const playerBox = { x: state.x, y: 340, w: 30, h: 45 };
+      
+      for (const o of state.obstacles) {
+        if (
+          playerBox.x < o.x + 24 &&
+          playerBox.x + playerBox.w > o.x &&
+          playerBox.y < o.y + 24 &&
+          playerBox.y + playerBox.h > o.y
+        ) {
+          setGameOver(true);
+          setIsPlaying(false);
+          if (state.score > highScore) {
+            setHighScore(state.score);
+            localStorage.setItem("broomBest", state.score);
+          }
+          return;
+        }
+      }
+      
+      const remainingSnitches = [];
+      for (const s of state.snitches) {
+        if (
+          playerBox.x < s.x + 20 &&
+          playerBox.x + playerBox.w > s.x &&
+          playerBox.y < s.y + 20 &&
+          playerBox.y + playerBox.h > s.y
+        ) {
+          state.score += 10;
+          setScore(state.score);
+          if (state.score > 0 && state.score % 50 === 0) state.speed += 0.5;
+        } else if (s.y < 400) {
+          remainingSnitches.push(s);
+        }
+      }
+      state.snitches = remainingSnitches;
+      state.obstacles = state.obstacles.filter(o => o.y < 400);
+      
+      const now = Date.now();
+      if (now - state.lastSpawn > 1200) {
+        state.obstacles.push({ x: Math.random() * 250 + 10, y: -30 });
+        state.lastSpawn = now;
+      }
+      
+      if (now - state.lastSnitchSpawn > 2000) {
+        state.snitches.push({ x: Math.random() * 250 + 10, y: -30 });
+        state.lastSnitchSpawn = now;
+      }
+      
+      ctx.clearRect(0, 0, 300, 400);
+      
+      ctx.fillStyle = "#160e25";
+      ctx.fillRect(0, 0, 300, 400);
+      
+      ctx.strokeStyle = "rgba(212, 175, 55, 0.4)";
+      ctx.lineWidth = 4;
+      ctx.strokeRect(4, 4, 292, 392);
+      
+      state.snitches.forEach(s => {
+        ctx.fillStyle = "rgba(255,255,255,0.7)";
+        ctx.beginPath();
+        ctx.ellipse(s.x + 10, s.y + 10, 12, 4, Math.PI/6, 0, Math.PI*2);
+        ctx.ellipse(s.x + 10, s.y + 10, 12, 4, -Math.PI/6, 0, Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle = "#ffd700";
+        ctx.beginPath();
+        ctx.arc(s.x + 10, s.y + 10, 8, 0, Math.PI*2);
+        ctx.fill();
+      });
+      
+      state.obstacles.forEach(o => {
+        ctx.fillStyle = "#5c0e18";
+        ctx.beginPath();
+        ctx.arc(o.x + 12, o.y + 12, 12, 0, Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle = "#ffd700";
+        for (let a = 0; a < Math.PI * 2; a += Math.PI / 4) {
+          ctx.beginPath();
+          ctx.moveTo(o.x + 12, o.y + 12);
+          ctx.lineTo(o.x + 12 + Math.cos(a)*16, o.y + 12 + Math.sin(a)*16);
+          ctx.stroke();
+        }
+      });
+      
+      ctx.fillStyle = "#740001";
+      ctx.beginPath();
+      ctx.moveTo(state.x + 15, 340 + 10);
+      ctx.lineTo(state.x + 5, 340 + 40);
+      ctx.lineTo(state.x + 25, 340 + 40);
+      ctx.closePath();
+      ctx.fill();
+      
+      ctx.strokeStyle = "#8b5a2b";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(state.x + 15, 340);
+      ctx.lineTo(state.x + 15, 340 + 45);
+      ctx.stroke();
+      
+      ctx.fillStyle = "#d4af37";
+      ctx.beginPath();
+      ctx.moveTo(state.x + 10, 340 + 42);
+      ctx.lineTo(state.x + 20, 340 + 42);
+      ctx.lineTo(state.x + 15, 340 + 48);
+      ctx.closePath();
+      ctx.fill();
+      
+      ctx.fillStyle = "#f5d0a9";
+      ctx.beginPath();
+      ctx.arc(state.x + 15, 340 + 10, 6, 0, Math.PI*2);
+      ctx.fill();
+      
+      ctx.fillStyle = "#4a0e17";
+      ctx.beginPath();
+      ctx.moveTo(state.x + 8, 340 + 6);
+      ctx.lineTo(state.x + 22, 340 + 6);
+      ctx.lineTo(state.x + 15, 340 - 4);
+      ctx.closePath();
+      ctx.fill();
+      
+      animId = requestAnimationFrame(update);
+    };
+    
+    animId = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(animId);
+  }, [isPlaying, gameOver, highScore]);
+
+  return (
+    <div style={{ background: "#130c1d", borderRadius: 24, padding: "1.5rem", border: "2px solid var(--pink)", textAlign: "center", color: "#f7edd4" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+        <span style={{ fontSize: 11, fontWeight: 800, color: "var(--pink)" }}>🧹 Broom Racer</span>
+        <span style={{ fontSize: 11, fontWeight: 900, color: "var(--pink)" }}>🏆 Best: {highScore}</span>
+      </div>
+      
+      <div style={{ position: "relative", width: 300, height: 400, margin: "0 auto", borderRadius: 16, overflow: "hidden" }}>
+        <canvas ref={canvasRef} width={300} height={400} style={{ display: "block", background: "#160e25" }} />
+        
+        {(!isPlaying || gameOver) && (
+          <div style={{
+            position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
+            background: "rgba(19, 12, 29, 0.85)", display: "flex", flexDirection: "column",
+            alignItems: "center", justifyContent: "center", padding: 20
+          }}>
+            {gameOver ? (
+              <>
+                <div style={{ fontSize: 48 }}>💥</div>
+                <h3 style={{ fontFamily: "'Cinzel Decorative', serif", fontSize: 20, color: "var(--pink)", margin: "8px 0" }}>Broom Crashed!</h3>
+                <p style={{ fontSize: 28, fontWeight: 900, color: "white", marginBottom: 16 }}>Score: {score}</p>
+              </>
+            ) : (
+              <>
+                <div style={{ fontSize: 48, animation: "float 3s infinite" }}>🧹</div>
+                <h3 style={{ fontFamily: "'Cinzel Decorative', serif", fontSize: 18, color: "var(--pink)", margin: "8px 0" }}>Magical Broom Racer</h3>
+                <p style={{ fontSize: 13, color: "#dfd2b5", marginBottom: 16 }}>Dodge the spiky Bludgers and catch the Golden Snitches!</p>
+              </>
+            )}
+            <button className="btn-primary" onClick={reset}>
+              {gameOver ? "Fly Again ⚡" : "Start Flight 🪄"}
+            </button>
+          </div>
+        )}
+      </div>
+      
+      {isPlaying && (
+        <div style={{ display: "flex", justifyContent: "center", gap: 20, marginTop: 14 }}>
+          <button
+            onMouseDown={() => { stateRef.current.keys["ArrowLeft"] = true; }}
+            onMouseUp={() => { stateRef.current.keys["ArrowLeft"] = false; }}
+            onTouchStart={() => { stateRef.current.keys["ArrowLeft"] = true; }}
+            onTouchEnd={() => { stateRef.current.keys["ArrowLeft"] = false; }}
+            style={{
+              width: 60, height: 45, borderRadius: 12, background: "rgba(255,255,255,0.08)",
+              border: "2px solid rgba(212,175,55,0.3)", color: "white", fontSize: 18, fontWeight: 900, cursor: "pointer"
+            }}
+          >◀</button>
+          <button
+            onMouseDown={() => { stateRef.current.keys["ArrowRight"] = true; }}
+            onMouseUp={() => { stateRef.current.keys["ArrowRight"] = false; }}
+            onTouchStart={() => { stateRef.current.keys["ArrowRight"] = true; }}
+            onTouchEnd={() => { stateRef.current.keys["ArrowRight"] = false; }}
+            style={{
+              width: 60, height: 45, borderRadius: 12, background: "rgba(255,255,255,0.08)",
+              border: "2px solid rgba(212,175,55,0.3)", color: "white", fontSize: 18, fontWeight: 900, cursor: "pointer"
+            }}
+          >▶</button>
+        </div>
+      )}
+      <p style={{ fontSize: 11, color: "#dfd2b5", marginTop: 8 }}>Use Arrow keys Left / Right or buttons to control your broom.</p>
     </div>
   );
 }
 
 // ── MAIN Games Page ───────────────────────────────────────────────
 const GAMES = [
-  { id:"math",   label:"Math Blitz",    emoji:"🧮", desc:"Solve fast! Beat the clock",  color:"#e3f0ff", border:"#bbdefb" },
-  { id:"word",   label:"Word Scramble", emoji:"🔤", desc:"Unscramble science & tech words", color:"#fce4ef", border:"#f8bbd0" },
-  { id:"memory", label:"Memory Match",  emoji:"🧠", desc:"Find the matching pairs",      color:"#e8f5e9", border:"#c8e6c9" },
-  { id:"code",   label:"Code Fill-in",  emoji:"💻", desc:"Complete the code snippet",    color:"#ede7f6", border:"#d1c4e9" },
-  { id:"ttt",    label:"Tic Tac Toe",   emoji:"⭕", desc:"2-player classic! X vs O",    color:"#fff3e0", border:"#ffe0b2" },
+  { id:"math",   label:"Math Blitz",    emoji:"🧮", desc:"Solve fast! Beat the clock",  color:"#1b102b", border:"#ffd700" },
+  { id:"word",   label:"Word Scramble", emoji:"🔤", desc:"Unscramble science & tech words", color:"#1b102b", border:"#ffd700" },
+  { id:"memory", label:"Memory Match",  emoji:"🧠", desc:"Find the matching pairs",      color:"#1b102b", border:"#ffd700" },
+  { id:"code",   label:"Code Fill-in",  emoji:"💻", desc:"Complete the code snippet",    color:"#1b102b", border:"#ffd700" },
+  { id:"ttt",    label:"Tic Tac Toe",   emoji:"⭕", desc:"Play against the Hogwarts AI", color:"#1b102b", border:"#ffd700" },
+  { id:"broom",  label:"Broom Racer",   emoji:"🧹", desc:"Fly your broom & catch Snitches", color:"#1b102b", border:"#ffd700" }
 ];
 
 export default function Games(){
@@ -400,14 +719,15 @@ export default function Games(){
 
       {/* Header */}
       <div style={{
-        background:"linear-gradient(135deg,#fce4ef 0%,#e3f0ff 100%)",
+        background:"linear-gradient(135deg, #160e25 0%, #291a3c 100%)",
         padding:"1.75rem 1.25rem 1.5rem",
+        borderBottom: "2px solid var(--pink)"
       }}>
-        <h1 style={{ fontFamily:"'Nunito',sans-serif", fontWeight:900, fontSize:"clamp(22px,5vw,32px)", color:"#1a237e", marginBottom:4 }}>
+        <h1 style={{ fontFamily:"'Cinzel Decorative',serif", fontWeight:900, fontSize:"clamp(22px,5vw,32px)", color:"var(--pink)", marginBottom:4 }}>
           🎮 Brain Games
         </h1>
-        <p style={{ fontSize:13, color:"#5c6bc0", fontWeight:700 }}>
-          Play, learn and level up! Games for ages 10–18 🚀
+        <p style={{ fontSize:13, color:"#dfd2b5", fontWeight:700 }}>
+          Play, learn and level up! Games for young wizards 🚀
         </p>
       </div>
 
@@ -416,7 +736,7 @@ export default function Games(){
         {/* Game selector */}
         {!active && (
           <>
-            <p style={{ fontSize:12, fontWeight:800, color:"#7986cb", marginBottom:12 }}>
+            <p style={{ fontSize:12, fontWeight:800, color:"var(--pink)", marginBottom:12 }}>
               Pick a game to play 👇
             </p>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:12, marginBottom:20 }}>
@@ -430,15 +750,15 @@ export default function Games(){
                   }}
                 >
                   <div style={{ fontSize:36, marginBottom:8, animation:"float 3s ease-in-out infinite" }}>{g.emoji}</div>
-                  <div style={{ fontFamily:"'Nunito',sans-serif", fontWeight:900, fontSize:15, color:"#1a237e", marginBottom:4 }}>{g.label}</div>
-                  <div style={{ fontSize:12, fontWeight:700, color:"#7986cb" }}>{g.desc}</div>
+                  <div style={{ fontFamily:"'Cinzel Decorative',serif", fontWeight:900, fontSize:15, color:"var(--pink)", marginBottom:4 }}>{g.label}</div>
+                  <div style={{ fontSize:12, fontWeight:700, color:"#dfd2b5" }}>{g.desc}</div>
                 </div>
               ))}
             </div>
 
             {/* Fun facts */}
-            <div style={{ background:"white", borderRadius:22, padding:"1.25rem", border:"2px solid #fce4ef" }}>
-              <p style={{ fontFamily:"'Nunito',sans-serif", fontWeight:900, fontSize:14, color:"#1a237e", marginBottom:10 }}>
+            <div style={{ background:"#130c1d", borderRadius:22, padding:"1.25rem", border:"2px solid var(--pink)" }}>
+              <p style={{ fontFamily:"'Cinzel Decorative',serif", fontWeight:900, fontSize:14, color:"var(--pink)", marginBottom:10 }}>
                 💡 Did you know?
               </p>
               {[
@@ -448,8 +768,8 @@ export default function Games(){
               ].map((f,i)=>(
                 <div key={i} style={{
                   padding:"8px 12px", borderRadius:12,
-                  background: i%2===0 ? "#fdf4f8" : "#f0f4ff",
-                  marginBottom:8, fontSize:13, fontWeight:700, color:"#5c6bc0",
+                  background: i%2===0 ? "#23132e" : "#121a2d",
+                  marginBottom:8, fontSize:13, fontWeight:700, color:"#dfd2b5",
                 }}>{f}</div>
               ))}
             </div>
@@ -460,13 +780,13 @@ export default function Games(){
         {active && (
           <div className="animate-fadeUp">
             <button onClick={()=>setActive(null)} style={{
-              background:"white", border:"2px solid #e3f0ff", borderRadius:14,
-              padding:"8px 16px", fontFamily:"'Nunito',sans-serif",
-              fontWeight:800, fontSize:13, color:"#1565c0", cursor:"pointer",
+              background:"var(--parchment)", border:"2px solid var(--pink)", borderRadius:14,
+              padding:"8px 16px", fontFamily:"'Cinzel Decorative',serif",
+              fontWeight:800, fontSize:12, color:"#4a0e17", cursor:"pointer",
               marginBottom:14, display:"flex", alignItems:"center", gap:6,
             }}>← Back to Games</button>
 
-            <h2 style={{ fontFamily:"'Nunito',sans-serif", fontWeight:900, fontSize:18, color:"#1a237e", marginBottom:14 }}>
+            <h2 style={{ fontFamily:"'Cinzel Decorative',serif", fontWeight:900, fontSize:18, color:"var(--pink)", marginBottom:14 }}>
               {GAMES.find(g=>g.id===active)?.emoji} {GAMES.find(g=>g.id===active)?.label}
             </h2>
 
@@ -475,6 +795,7 @@ export default function Games(){
             {active==="memory" && <MemoryMatch />}
             {active==="code"   && <CodeFill />}
             {active==="ttt"    && <TicTacToe />}
+            {active==="broom"  && <BroomRacing />}
           </div>
         )}
       </div>
