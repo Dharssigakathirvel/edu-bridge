@@ -304,7 +304,7 @@ const WINS = [
 
 function TicTacToe(){
   const [board, setBoard] = useState(Array(9).fill(null));
-  const [xTurn, setXTurn] = useState(true); // Player is X (always true turn first)
+  const [xTurn, setXTurn] = useState(true); // Player is X
   const [winLine, setWinLine] = useState(null);
 
   function getWinner(b){
@@ -385,22 +385,22 @@ function TicTacToe(){
 
   const result = winLine;
   const cellColors = {
-    X: "linear-gradient(135deg,#740001,#ae0001)",
-    O: "linear-gradient(135deg,#1b102b,#d4af37)",
-    null: "linear-gradient(135deg,#2e1a2f,#160e1f)",
+    X: "linear-gradient(135deg,#ec407a,#e91e8c)",
+    O: "linear-gradient(135deg,#29b6f6,#0288d1)",
+    null: "linear-gradient(135deg,#fce4ef,#e3f0ff)",
   };
 
   return (
-    <div style={{ background:"#130c1d", borderRadius:24, padding:"1.5rem", border:"2px solid var(--pink)" }}>
+    <div style={{ background:"white", borderRadius:24, padding:"1.5rem", border:"2px solid #ffe0b2" }}>
       <div style={{ display:"flex", justifyContent:"space-between", marginBottom:12, alignItems:"center" }}>
-        <span style={{ fontSize:11, fontWeight:800, color:"var(--pink)" }}>⭕ Tic Tac Toe</span>
+        <span style={{ fontSize:11, fontWeight:800, color:"#ffa726" }}>⭕ Tic Tac Toe vs Bot</span>
         {result ? (
-          <span style={{ fontSize:12, fontWeight:900, color: result.winner==="Draw"?"#ff6f00":"var(--pink)" }}>
-            {result.winner==="Draw" ? "🤝 It's a Draw!" : (result.winner === "X" ? "🏆 You Win! 🎉" : "😢 Computer Wins!")}
+          <span style={{ fontSize:12, fontWeight:900, color: result.winner==="Draw"?"#ff6f00":"#e91e8c" }}>
+            {result.winner==="Draw" ? "🤝 It's a Draw!" : (result.winner === "X" ? "🏆 You Win! 🎉" : "😢 Bot Wins!")}
           </span>
         ) : (
-          <span style={{ fontSize:12, fontWeight:800, color: xTurn?"var(--pink)":"#8a70d6" }}>
-            {xTurn ? "⚡ Your Turn (X)" : "🧙‍♂️ Computer is thinking... (O)"}
+          <span style={{ fontSize:12, fontWeight:800, color: xTurn?"#e91e8c":"#0288d1" }}>
+            {xTurn ? "⚡ Your Turn (X)" : "🤖 Bot is thinking... (O)"}
           </span>
         )}
       </div>
@@ -411,15 +411,15 @@ function TicTacToe(){
           return (
             <div key={i} onClick={()=>click(i)} style={{
               height:80, borderRadius:16,
-              background: isWinCell ? "linear-gradient(135deg,#2e7d32,#43a047)" : cellColors[val],
+              background: isWinCell ? "linear-gradient(135deg,#81c784,#4caf50)" : cellColors[val],
               display:"flex", alignItems:"center", justifyContent:"center",
               fontSize:36, fontWeight:900, cursor: val||result||!xTurn?"default":"pointer",
-              color: val==="X"?"#fff6df" : val==="O"?"#ffd700" : "transparent",
-              border: isWinCell?"3px solid #ffd700":"2px solid var(--pink-light)",
+              color: val==="X"?"white" : val==="O"?"white" : "transparent",
+              border: isWinCell?"3px solid #4caf50":"2px solid transparent",
               transition:"all 0.2s ease",
               transform: isWinCell?"scale(1.08)":"scale(1)",
               userSelect:"none",
-              boxShadow: val ? "0 4px 12px rgba(0,0,0,0.3)" : "none",
+              boxShadow: val ? "0 4px 12px rgba(0,0,0,0.1)" : "none",
             }}>
               {val || "·"}
             </div>
@@ -429,18 +429,43 @@ function TicTacToe(){
 
       <button onClick={reset} style={{
         width:"100%", marginTop:4,
-        background:"var(--parchment)",
-        border:"2px solid var(--pink)", borderRadius:14,
-        padding:"10px", fontFamily:"'Cinzel Decorative',serif",
-        fontWeight:800, fontSize:12, color:"#4a0e17", cursor:"pointer",
+        background:"linear-gradient(135deg,#fce4ef,#e3f0ff)",
+        border:"2px solid #e3f0ff", borderRadius:14,
+        padding:"10px", fontFamily:"'Nunito',sans-serif",
+        fontWeight:800, fontSize:13, color:"#1a237e", cursor:"pointer",
         transition:"background 0.2s",
       }}>🔄 Reset Board</button>
     </div>
   );
 }
 
-// ── GAME 6: Broom Racer (Canvas) ──────────────────────────────────
-function BroomRacing() {
+// Helper to draw a star on canvas
+function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
+  let rot = Math.PI / 2 * 3;
+  let x = cx;
+  let y = cy;
+  let step = Math.PI / spikes;
+
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - outerRadius);
+  for (let i = 0; i < spikes; i++) {
+    x = cx + Math.cos(rot) * outerRadius;
+    y = cy + Math.sin(rot) * outerRadius;
+    ctx.lineTo(x, y);
+    rot += step;
+
+    x = cx + Math.cos(rot) * innerRadius;
+    y = cy + Math.sin(rot) * innerRadius;
+    ctx.lineTo(x, y);
+    rot += step;
+  }
+  ctx.lineTo(cx, cy - outerRadius);
+  ctx.closePath();
+  ctx.fill();
+}
+
+// ── GAME 6: Star Chaser (Canvas) ──────────────────────────────────
+function StarChaser() {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -455,7 +480,8 @@ function BroomRacing() {
     score: 0,
     lastSpawn: 0,
     lastSnitchSpawn: 0,
-    speed: 3
+    speed: 3,
+    frameCount: 0
   });
 
   const reset = () => {
@@ -467,7 +493,8 @@ function BroomRacing() {
       score: 0,
       lastSpawn: 0,
       lastSnitchSpawn: 0,
-      speed: 3
+      speed: 3,
+      frameCount: 0
     };
     setScore(0);
     setGameOver(false);
@@ -546,6 +573,13 @@ function BroomRacing() {
       state.snitches = remainingSnitches;
       state.obstacles = state.obstacles.filter(o => o.y < 400);
       
+      // Survival score: +1 point every 60 frames (~1 second)
+      state.frameCount = (state.frameCount || 0) + 1;
+      if (state.frameCount % 60 === 0) {
+        state.score += 1;
+        setScore(state.score);
+      }
+      
       const now = Date.now();
       if (now - state.lastSpawn > 1200) {
         state.obstacles.push({ x: Math.random() * 250 + 10, y: -30 });
@@ -559,74 +593,108 @@ function BroomRacing() {
       
       ctx.clearRect(0, 0, 300, 400);
       
-      ctx.fillStyle = "#160e25";
+      // Draw background sky gradient
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, 400);
+      skyGrad.addColorStop(0, "#1a237e");
+      skyGrad.addColorStop(1, "#311b92");
+      ctx.fillStyle = skyGrad;
       ctx.fillRect(0, 0, 300, 400);
       
-      ctx.strokeStyle = "rgba(212, 175, 55, 0.4)";
+      // Soft glowing border
+      ctx.strokeStyle = "rgba(233, 30, 140, 0.35)";
       ctx.lineWidth = 4;
       ctx.strokeRect(4, 4, 292, 392);
       
+      // Draw collectable dream gems
       state.snitches.forEach(s => {
-        ctx.fillStyle = "rgba(255,255,255,0.7)";
+        ctx.fillStyle = "#ec407a";
+        ctx.shadowColor = "#ff85a7";
+        ctx.shadowBlur = 8;
         ctx.beginPath();
-        ctx.ellipse(s.x + 10, s.y + 10, 12, 4, Math.PI/6, 0, Math.PI*2);
-        ctx.ellipse(s.x + 10, s.y + 10, 12, 4, -Math.PI/6, 0, Math.PI*2);
+        ctx.moveTo(s.x + 10, s.y + 2);
+        ctx.lineTo(s.x + 17, s.y + 10);
+        ctx.lineTo(s.x + 10, s.y + 18);
+        ctx.lineTo(s.x + 3, s.y + 10);
+        ctx.closePath();
         ctx.fill();
-        ctx.fillStyle = "#ffd700";
+        
+        ctx.fillStyle = "#ffffff";
         ctx.beginPath();
-        ctx.arc(s.x + 10, s.y + 10, 8, 0, Math.PI*2);
+        ctx.moveTo(s.x + 10, s.y + 4);
+        ctx.lineTo(s.x + 13, s.y + 10);
+        ctx.lineTo(s.x + 10, s.y + 12);
+        ctx.closePath();
         ctx.fill();
+        ctx.shadowBlur = 0;
       });
       
+      // Draw obstacles (cute storm clouds)
       state.obstacles.forEach(o => {
-        ctx.fillStyle = "#5c0e18";
+        ctx.fillStyle = "#cfd8dc";
         ctx.beginPath();
-        ctx.arc(o.x + 12, o.y + 12, 12, 0, Math.PI*2);
+        ctx.arc(o.x + 6, o.y + 12, 6, 0, Math.PI * 2);
+        ctx.arc(o.x + 12, o.y + 8, 8, 0, Math.PI * 2);
+        ctx.arc(o.x + 18, o.y + 12, 6, 0, Math.PI * 2);
+        ctx.rect(o.x + 6, o.y + 9, 12, 6);
+        ctx.closePath();
         ctx.fill();
-        ctx.fillStyle = "#ffd700";
-        for (let a = 0; a < Math.PI * 2; a += Math.PI / 4) {
-          ctx.beginPath();
-          ctx.moveTo(o.x + 12, o.y + 12);
-          ctx.lineTo(o.x + 12 + Math.cos(a)*16, o.y + 12 + Math.sin(a)*16);
-          ctx.stroke();
-        }
+        
+        // Draw tiny lightning bolt
+        ctx.fillStyle = "#ffd54f";
+        ctx.beginPath();
+        ctx.moveTo(o.x + 12, o.y + 13);
+        ctx.lineTo(o.x + 9, o.y + 18);
+        ctx.lineTo(o.x + 12, o.y + 18);
+        ctx.lineTo(o.x + 11, o.y + 22);
+        ctx.lineTo(o.x + 15, o.y + 16);
+        ctx.lineTo(o.x + 12, o.y + 16);
+        ctx.closePath();
+        ctx.fill();
       });
       
-      ctx.fillStyle = "#740001";
+      // Draw Star Player
+      const cx = state.x + 15;
+      const cy = 340 + 20;
+      
+      // Spark trail
+      ctx.fillStyle = "rgba(255, 224, 130, 0.25)";
       ctx.beginPath();
-      ctx.moveTo(state.x + 15, 340 + 10);
-      ctx.lineTo(state.x + 5, 340 + 40);
-      ctx.lineTo(state.x + 25, 340 + 40);
+      ctx.moveTo(cx - 6, cy + 5);
+      ctx.lineTo(cx + 6, cy + 5);
+      ctx.lineTo(cx + 10, cy + 25);
+      ctx.lineTo(cx - 10, cy + 25);
       ctx.closePath();
       ctx.fill();
       
-      ctx.strokeStyle = "#8b5a2b";
-      ctx.lineWidth = 4;
+      ctx.fillStyle = "#ffd54f";
+      ctx.shadowColor = "#ffeb3b";
+      ctx.shadowBlur = 12;
+      drawStar(ctx, cx, cy, 5, 14, 7);
+      ctx.shadowBlur = 0;
+      
+      // Eyes
+      ctx.fillStyle = "#1a237e";
       ctx.beginPath();
-      ctx.moveTo(state.x + 15, 340);
-      ctx.lineTo(state.x + 15, 340 + 45);
+      ctx.arc(cx - 3, cy - 1, 1.8, 0, Math.PI * 2);
+      ctx.arc(cx + 3, cy - 1, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Smile
+      ctx.strokeStyle = "#1a237e";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(cx, cy + 2, 1.8, 0, Math.PI);
       ctx.stroke();
       
-      ctx.fillStyle = "#d4af37";
-      ctx.beginPath();
-      ctx.moveTo(state.x + 10, 340 + 42);
-      ctx.lineTo(state.x + 20, 340 + 42);
-      ctx.lineTo(state.x + 15, 340 + 48);
-      ctx.closePath();
-      ctx.fill();
-      
-      ctx.fillStyle = "#f5d0a9";
-      ctx.beginPath();
-      ctx.arc(state.x + 15, 340 + 10, 6, 0, Math.PI*2);
-      ctx.fill();
-      
-      ctx.fillStyle = "#4a0e17";
-      ctx.beginPath();
-      ctx.moveTo(state.x + 8, 340 + 6);
-      ctx.lineTo(state.x + 22, 340 + 6);
-      ctx.lineTo(state.x + 15, 340 - 4);
-      ctx.closePath();
-      ctx.fill();
+      // Draw score in top left of canvas
+      ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+      ctx.font = "bold 13px 'Nunito', sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText(`✨ Score: ${state.score}`, 14, 26);
+
+      // Draw high score in top right of canvas
+      ctx.textAlign = "right";
+      ctx.fillText(`🏆 Best: ${highScore}`, 286, 26);
       
       animId = requestAnimationFrame(update);
     };
@@ -636,36 +704,36 @@ function BroomRacing() {
   }, [isPlaying, gameOver, highScore]);
 
   return (
-    <div style={{ background: "#130c1d", borderRadius: 24, padding: "1.5rem", border: "2px solid var(--pink)", textAlign: "center", color: "#f7edd4" }}>
+    <div style={{ background: "white", borderRadius: 24, padding: "1.5rem", border: "2px solid #b2ebf2", textAlign: "center", color: "var(--navy)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-        <span style={{ fontSize: 11, fontWeight: 800, color: "var(--pink)" }}>🧹 Broom Racer</span>
-        <span style={{ fontSize: 11, fontWeight: 900, color: "var(--pink)" }}>🏆 Best: {highScore}</span>
+        <span style={{ fontSize: 11, fontWeight: 800, color: "var(--blue)" }}>✨ Star Chaser</span>
+        <span style={{ fontSize: 11, fontWeight: 900, color: "var(--blue)" }}>✨ Score: {score} | 🏆 Best: {highScore}</span>
       </div>
       
-      <div style={{ position: "relative", width: 300, height: 400, margin: "0 auto", borderRadius: 16, overflow: "hidden" }}>
-        <canvas ref={canvasRef} width={300} height={400} style={{ display: "block", background: "#160e25" }} />
+      <div style={{ position: "relative", width: 300, height: 400, margin: "0 auto", borderRadius: 16, overflow: "hidden", boxShadow: "0 8px 24px rgba(26,35,126,0.15)" }}>
+        <canvas ref={canvasRef} width={300} height={400} style={{ display: "block" }} />
         
         {(!isPlaying || gameOver) && (
           <div style={{
             position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
-            background: "rgba(19, 12, 29, 0.85)", display: "flex", flexDirection: "column",
+            background: "rgba(26, 35, 126, 0.88)", display: "flex", flexDirection: "column",
             alignItems: "center", justifyContent: "center", padding: 20
           }}>
             {gameOver ? (
               <>
-                <div style={{ fontSize: 48 }}>💥</div>
-                <h3 style={{ fontFamily: "'Cinzel Decorative', serif", fontSize: 20, color: "var(--pink)", margin: "8px 0" }}>Broom Crashed!</h3>
+                <div style={{ fontSize: 48, animation: "float 3s infinite" }}>💥</div>
+                <h3 style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 900, fontSize: 20, color: "#fff59d", margin: "8px 0" }}>Crash! Cloud Storm!</h3>
                 <p style={{ fontSize: 28, fontWeight: 900, color: "white", marginBottom: 16 }}>Score: {score}</p>
               </>
             ) : (
               <>
-                <div style={{ fontSize: 48, animation: "float 3s infinite" }}>🧹</div>
-                <h3 style={{ fontFamily: "'Cinzel Decorative', serif", fontSize: 18, color: "var(--pink)", margin: "8px 0" }}>Magical Broom Racer</h3>
-                <p style={{ fontSize: 13, color: "#dfd2b5", marginBottom: 16 }}>Dodge the spiky Bludgers and catch the Golden Snitches!</p>
+                <div style={{ fontSize: 52, animation: "float 3s infinite" }}>🌠</div>
+                <h3 style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 900, fontSize: 20, color: "#fff59d", margin: "8px 0" }}>Magical Star Chaser</h3>
+                <p style={{ fontSize: 13, color: "#e3f0ff", marginBottom: 16 }}>Steer your shooting star! Catch dream gems and dodge dark storm clouds!</p>
               </>
             )}
             <button className="btn-primary" onClick={reset}>
-              {gameOver ? "Fly Again ⚡" : "Start Flight 🪄"}
+              {gameOver ? "Fly Again ✨" : "Start Flight 🚀"}
             </button>
           </div>
         )}
@@ -679,9 +747,12 @@ function BroomRacing() {
             onTouchStart={() => { stateRef.current.keys["ArrowLeft"] = true; }}
             onTouchEnd={() => { stateRef.current.keys["ArrowLeft"] = false; }}
             style={{
-              width: 60, height: 45, borderRadius: 12, background: "rgba(255,255,255,0.08)",
-              border: "2px solid rgba(212,175,55,0.3)", color: "white", fontSize: 18, fontWeight: 900, cursor: "pointer"
+              width: 60, height: 45, borderRadius: 12, background: "#e3f0ff",
+              border: "2px solid #b2ebf2", color: "var(--blue)", fontSize: 18, fontWeight: 900, cursor: "pointer",
+              transition: "transform 0.1s"
             }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.05)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; }}
           >◀</button>
           <button
             onMouseDown={() => { stateRef.current.keys["ArrowRight"] = true; }}
@@ -689,25 +760,28 @@ function BroomRacing() {
             onTouchStart={() => { stateRef.current.keys["ArrowRight"] = true; }}
             onTouchEnd={() => { stateRef.current.keys["ArrowRight"] = false; }}
             style={{
-              width: 60, height: 45, borderRadius: 12, background: "rgba(255,255,255,0.08)",
-              border: "2px solid rgba(212,175,55,0.3)", color: "white", fontSize: 18, fontWeight: 900, cursor: "pointer"
+              width: 60, height: 45, borderRadius: 12, background: "#e3f0ff",
+              border: "2px solid #b2ebf2", color: "var(--blue)", fontSize: 18, fontWeight: 900, cursor: "pointer",
+              transition: "transform 0.1s"
             }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.05)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; }}
           >▶</button>
         </div>
       )}
-      <p style={{ fontSize: 11, color: "#dfd2b5", marginTop: 8 }}>Use Arrow keys Left / Right or buttons to control your broom.</p>
+      <p style={{ fontSize: 11, color: "var(--blue-mid)", marginTop: 8 }}>Use Arrow keys Left / Right or buttons to control your star.</p>
     </div>
   );
 }
 
 // ── MAIN Games Page ───────────────────────────────────────────────
 const GAMES = [
-  { id:"math",   label:"Math Blitz",    emoji:"🧮", desc:"Solve fast! Beat the clock",  color:"#1b102b", border:"#ffd700" },
-  { id:"word",   label:"Word Scramble", emoji:"🔤", desc:"Unscramble science & tech words", color:"#1b102b", border:"#ffd700" },
-  { id:"memory", label:"Memory Match",  emoji:"🧠", desc:"Find the matching pairs",      color:"#1b102b", border:"#ffd700" },
-  { id:"code",   label:"Code Fill-in",  emoji:"💻", desc:"Complete the code snippet",    color:"#1b102b", border:"#ffd700" },
-  { id:"ttt",    label:"Tic Tac Toe",   emoji:"⭕", desc:"Play against the Hogwarts AI", color:"#1b102b", border:"#ffd700" },
-  { id:"broom",  label:"Broom Racer",   emoji:"🧹", desc:"Fly your broom & catch Snitches", color:"#1b102b", border:"#ffd700" }
+  { id:"math",   label:"Math Blitz",    emoji:"🧮", desc:"Solve fast! Beat the clock",  color:"#e3f0ff", border:"#bbdefb" },
+  { id:"word",   label:"Word Scramble", emoji:"🔤", desc:"Unscramble science & tech words", color:"#fce4ef", border:"#f8bbd0" },
+  { id:"memory", label:"Memory Match",  emoji:"🧠", desc:"Find the matching pairs",      color:"#e8f5e9", border:"#c8e6c9" },
+  { id:"code",   label:"Code Fill-in",  emoji:"💻", desc:"Complete the code snippet",    color:"#ede7f6", border:"#d1c4e9" },
+  { id:"ttt",    label:"Tic Tac Toe",   emoji:"⭕", desc:"Play against the Dreamy Bot",  color:"#fff3e0", border:"#ffe0b2" },
+  { id:"broom",  label:"Star Chaser",   emoji:"🌠", desc:"Fly your star & catch gems",    color:"#e0f7fa", border:"#b2ebf2" }
 ];
 
 export default function Games(){
@@ -719,15 +793,16 @@ export default function Games(){
 
       {/* Header */}
       <div style={{
-        background:"linear-gradient(135deg, #160e25 0%, #291a3c 100%)",
+        background:"linear-gradient(135deg, var(--pink-light) 0%, var(--blue-light) 100%)",
         padding:"1.75rem 1.25rem 1.5rem",
-        borderBottom: "2px solid var(--pink)"
+        borderBottom: "2px solid var(--pink-light)",
+        textAlign: "center"
       }}>
-        <h1 style={{ fontFamily:"'Cinzel Decorative',serif", fontWeight:900, fontSize:"clamp(22px,5vw,32px)", color:"var(--pink)", marginBottom:4 }}>
-          🎮 Brain Games
+        <h1 style={{ fontFamily:"'Nunito', sans-serif", fontWeight:900, fontSize:"clamp(24px,5vw,34px)", color:"var(--navy)", marginBottom:4 }}>
+          🎮 Magical Mind Games
         </h1>
-        <p style={{ fontSize:13, color:"#dfd2b5", fontWeight:700 }}>
-          Play, learn and level up! Games for young wizards 🚀
+        <p style={{ fontSize:13, color:"var(--blue-mid)", fontWeight:700 }}>
+          Play, learn and power up your brain! 🌟
         </p>
       </div>
 
@@ -750,8 +825,8 @@ export default function Games(){
                   }}
                 >
                   <div style={{ fontSize:36, marginBottom:8, animation:"float 3s ease-in-out infinite" }}>{g.emoji}</div>
-                  <div style={{ fontFamily:"'Cinzel Decorative',serif", fontWeight:900, fontSize:15, color:"var(--pink)", marginBottom:4 }}>{g.label}</div>
-                  <div style={{ fontSize:12, fontWeight:700, color:"#dfd2b5" }}>{g.desc}</div>
+                  <div style={{ fontFamily:"'Nunito',sans-serif", fontWeight:900, fontSize:15, color:"var(--navy)", marginBottom:4 }}>{g.label}</div>
+                  <div style={{ fontSize:12, fontWeight:700, color:"var(--blue-mid)" }}>{g.desc}</div>
                 </div>
               ))}
             </div>
@@ -762,13 +837,17 @@ export default function Games(){
         {active && (
           <div className="animate-fadeUp">
             <button onClick={()=>setActive(null)} style={{
-              background:"var(--parchment)", border:"2px solid var(--pink)", borderRadius:14,
-              padding:"8px 16px", fontFamily:"'Cinzel Decorative',serif",
-              fontWeight:800, fontSize:12, color:"#4a0e17", cursor:"pointer",
+              background:"white", border:"2px solid var(--pink-light)", borderRadius:14,
+              padding:"8px 16px", fontFamily:"'Nunito',sans-serif",
+              fontWeight:800, fontSize:13, color:"var(--pink)", cursor:"pointer",
               marginBottom:14, display:"flex", alignItems:"center", gap:6,
-            }}>← Back to Games</button>
+              transition:"background 0.2s"
+            }}
+            onMouseEnter={e=>e.currentTarget.style.background="var(--pink-light)"}
+            onMouseLeave={e=>e.currentTarget.style.background="white"}
+            >← Back to Games</button>
 
-            <h2 style={{ fontFamily:"'Cinzel Decorative',serif", fontWeight:900, fontSize:18, color:"var(--pink)", marginBottom:14 }}>
+            <h2 style={{ fontFamily:"'Nunito',sans-serif", fontWeight:900, fontSize:18, color:"var(--navy)", marginBottom:14 }}>
               {GAMES.find(g=>g.id===active)?.emoji} {GAMES.find(g=>g.id===active)?.label}
             </h2>
 
@@ -777,7 +856,7 @@ export default function Games(){
             {active==="memory" && <MemoryMatch />}
             {active==="code"   && <CodeFill />}
             {active==="ttt"    && <TicTacToe />}
-            {active==="broom"  && <BroomRacing />}
+            {active==="broom"  && <StarChaser />}
           </div>
         )}
       </div>

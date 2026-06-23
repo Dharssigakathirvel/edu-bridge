@@ -33,73 +33,73 @@ export default function Home() {
   const [quoteIndex, setQuoteIndex] = useState(0);
   const [flipping, setFlipping] = useState(false);
 
-  // Hogwarts Sorting Hat Quiz State
+  // Magic Study House Quiz State
   const [hatStep, setHatStep] = useState(0); // 0 = intro, 1-3 = Qs, 4 = Result
   const [points, setPoints] = useState({ Codedor: 0, Mathclaw: 0, Artpuff: 0, Scitherin: 0 });
   const [finalHouse, setFinalHouse] = useState(null);
 
   const quizQuestions = [
     {
-      q: "Which magical item calls out to you?",
+      q: "Which magical study tool calls out to you?",
       options: [
-        { text: "⌨️ A glowing keyboard of infinite commands", house: "Codedor" },
-        { text: "🧮 An ancient scroll of mathematical proofs", house: "Mathclaw" },
-        { text: "🎨 A canvas that brings illustrations to life", house: "Artpuff" },
-        { text: "🧪 A vial of secret, boiling scientific elements", house: "Scitherin" }
+        { text: "💻 A glowing keyboard that builds digital worlds", house: "Codedor" },
+        { text: "🧮 A cosmic chart of mathematical patterns", house: "Mathclaw" },
+        { text: "🎨 A paintbrush that colors the clouds in the sky", house: "Artpuff" },
+        { text: "🧪 A beaker of glowing, bubbling science experiments", house: "Scitherin" }
       ]
     },
     {
-      q: "When faced with a dark forest of bugs, you...",
+      q: "When you face a challenging problem, you like to...",
       options: [
-        { text: "🦁 Brave the danger and start hacking the path", house: "Codedor" },
-        { text: "🦅 Map out the coordinates and calculate the safest exit", house: "Mathclaw" },
-        { text: "🦡 Gather allies and paint glowing markers on trees", house: "Artpuff" },
-        { text: "🐍 Study the venomous plants to extract their power", house: "Scitherin" }
+        { text: "🚀 Jump right in and start experimenting with code", house: "Codedor" },
+        { text: "🧩 Map out the logic and calculate the perfect solution", house: "Mathclaw" },
+        { text: "✨ Sketch out creative ideas and share with friends", house: "Artpuff" },
+        { text: "🔬 Research the science behind it and test hypotheses", house: "Scitherin" }
       ]
     },
     {
-      q: "What is your ultimate magical ambition?",
+      q: "What is your ultimate dream power?",
       options: [
-        { text: "⚡ To build legendary artifacts and websites", house: "Codedor" },
-        { text: "🔍 To unlock the fundamental secrets of the universe", house: "Mathclaw" },
-        { text: "🎨 To inspire others and bring beauty to the world", house: "Artpuff" },
-        { text: "🧪 To master elements and rule over complex systems", house: "Scitherin" }
+        { text: "⚡ To build legendary apps, games and websites", house: "Codedor" },
+        { text: "🔍 To unlock the hidden codes of space and time", house: "Mathclaw" },
+        { text: "🌈 To inspire others and bring beauty to the world", house: "Artpuff" },
+        { text: "🧪 To invent new cures and master scientific systems", house: "Scitherin" }
       ]
     }
   ];
 
   const housesInfo = {
     Codedor: {
-      name: "Code-dor 🦁",
-      desc: "Bravery, daring, and chivalry! You command lines of code and build the future with software wizardry.",
-      color: "#ffd700",
-      bg: "#3a060d",
-      borderColor: "#ffd700",
-      icon: "🦁💻"
+      name: "Code Castle 🏰",
+      desc: "For the creators and builders! You write the magic spells of code and shape the future with awesome software engineering.",
+      color: "#1565c0",
+      bg: "#e3f0ff",
+      borderColor: "#bbdefb",
+      icon: "🏰💻"
     },
     Mathclaw: {
-      name: "Math-claw 🦅",
-      desc: "Intelligence, curiosity, and logic! You decode the secret patterns of the universe using mathematics.",
-      color: "#90caf9",
-      bg: "#07162b",
-      borderColor: "#90caf9",
-      icon: "🦅🧮"
+      name: "Logic Lagoon 🧮",
+      desc: "For the pattern solvers! You unlock the deep secret codes of the universe using logic, math and reasoning.",
+      color: "#7e57c2",
+      bg: "#ede7f6",
+      borderColor: "#d1c4e9",
+      icon: "🧮🧠"
     },
     Artpuff: {
-      name: "Art-puff 🦡",
-      desc: "Patience, loyalty, and playfulness! You decorate the magical world with color, music, and boundless creativity.",
-      color: "#ffd54f",
-      bg: "#241f0f",
-      borderColor: "#ffd54f",
-      icon: "🦡🎨"
+      name: "Creative Clouds ☁️",
+      desc: "For the dreamers! You paint the world with color, stories, art, and boundless imagination.",
+      color: "#ec407a",
+      bg: "#fce4ef",
+      borderColor: "#f8bbd0",
+      icon: "☁️🎨"
     },
     Scitherin: {
-      name: "Sci-therin 🐍",
-      desc: "Ambition, resourcefulness, and cleverness! You analyze complex experiments and master scientific logic.",
-      color: "#a5d6a7",
-      bg: "#051e0e",
-      borderColor: "#a5d6a7",
-      icon: "🐍🔬"
+      name: "Science Summit 🔬",
+      desc: "For the explorers! You analyze complex experiments and master the scientific wonders of nature.",
+      color: "#2e7d32",
+      bg: "#e8f5e9",
+      borderColor: "#c8e6c9",
+      icon: "🔬🧪"
     }
   };
 
@@ -447,39 +447,40 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Sorting Hat Section (Kid Interesting Feature) ── */}
+      {/* ── Magical Study House Quiz Section ── */}
       <section style={{ padding: "0 1.5rem 2.5rem", textAlign: "center" }}>
         <div style={{
-          background: "linear-gradient(135deg, #160e25 0%, #291a3c 100%)",
-          border: "2px solid var(--pink)",
+          background: "linear-gradient(135deg, var(--pink-light) 0%, var(--blue-light) 100%)",
+          border: "2.5px solid var(--pink-light)",
           borderRadius: 28,
           padding: "2.5rem 1.5rem",
           boxShadow: "var(--shadow-md)",
-          color: "#f6ebd4",
+          color: "var(--navy)",
           position: "relative",
           overflow: "hidden"
         }}>
           {/* Sparkles */}
-          <div style={{ position: "absolute", top: 12, right: 16, fontSize: 24, animation: "float 4s infinite" }}>🧙‍♂️</div>
-          <div style={{ position: "absolute", bottom: 12, left: 16, fontSize: 24, animation: "float 3s infinite" }}>✨</div>
+          <div style={{ position: "absolute", top: 12, right: 16, fontSize: 24, animation: "float 4s infinite" }}>🔮</div>
+          <div style={{ position: "absolute", bottom: 12, left: 16, fontSize: 24, animation: "float 3s infinite" }}>🌟</div>
 
           {hatStep === 0 && (
             <div>
-              <div style={{ fontSize: 64, marginBottom: 8, animation: "float 3s ease-in-out infinite" }}>🎩</div>
+              <div style={{ fontSize: 64, marginBottom: 8, animation: "float 3s ease-in-out infinite" }}>🔮</div>
               <h3 style={{
-                fontFamily: "'Cinzel Decorative', serif",
+                fontFamily: "'Nunito', sans-serif",
+                fontWeight: 900,
                 fontSize: 22,
-                color: "var(--pink)",
+                color: "var(--navy)",
                 marginBottom: 8,
-                letterSpacing: 1
+                letterSpacing: 0.5
               }}>
-                The Hogwarts Sorting Hat
+                ✨ The Magic Study House Quiz 🌟
               </h3>
-              <p style={{ fontSize: 14, color: "#dfd2b5", fontWeight: 700, maxWidth: 500, margin: "0 auto 24px", lineHeight: 1.6 }}>
-                Ah, step forward young learner! Let the Sorting Hat read your magical talents and assign you to one of the legendary Houses of Learning!
+              <p style={{ fontSize: 14, color: "var(--blue-mid)", fontWeight: 700, maxWidth: 500, margin: "0 auto 24px", lineHeight: 1.6 }}>
+                Step forward, young explorer! Answer a few magical questions to discover your Study House!
               </p>
               <button className="btn-primary" onClick={() => setHatStep(1)}>
-                Put on the Sorting Hat 🪄
+                Discover Your House 🔮
               </button>
             </div>
           )}
@@ -488,11 +489,12 @@ export default function Home() {
             <div>
               <span style={{ fontSize: 11, fontWeight: 900, color: "var(--pink)", letterSpacing: 2 }}>QUESTION {hatStep} OF 3</span>
               <h4 style={{
-                fontFamily: "'Cinzel Decorative', serif",
+                fontFamily: "'Nunito', sans-serif",
+                fontWeight: 800,
                 fontSize: 18,
                 marginTop: 8,
                 marginBottom: 20,
-                color: "white"
+                color: "var(--navy)"
               }}>
                 {quizQuestions[hatStep - 1].q}
               </h4>
@@ -502,12 +504,12 @@ export default function Home() {
                     key={i}
                     onClick={() => handleAnswer(opt.house)}
                     style={{
-                      background: "rgba(255, 255, 255, 0.05)",
-                      border: "2px solid rgba(212, 175, 55, 0.2)",
+                      background: "white",
+                      border: "2px solid var(--blue-light)",
                       borderRadius: 16,
                       padding: "14px 20px",
                       textAlign: "left",
-                      color: "#f7edd4",
+                      color: "var(--navy)",
                       fontFamily: "'Nunito', sans-serif",
                       fontWeight: 800,
                       fontSize: 14,
@@ -515,13 +517,13 @@ export default function Home() {
                       transition: "all 0.2s"
                     }}
                     onMouseEnter={e => {
-                      e.currentTarget.style.background = "rgba(212, 175, 55, 0.1)";
+                      e.currentTarget.style.background = "var(--pink-light)";
                       e.currentTarget.style.borderColor = "var(--pink)";
                       e.currentTarget.style.transform = "translateX(4px)";
                     }}
                     onMouseLeave={e => {
-                      e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
-                      e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.2)";
+                      e.currentTarget.style.background = "white";
+                      e.currentTarget.style.borderColor = "var(--blue-light)";
                       e.currentTarget.style.transform = "translateX(0)";
                     }}
                   >
@@ -535,9 +537,10 @@ export default function Home() {
           {hatStep === 4 && finalHouse && (
             <div className="animate-bounce-in">
               <div style={{ fontSize: 72, marginBottom: 8 }}>{housesInfo[finalHouse].icon}</div>
-              <span style={{ fontSize: 11, fontWeight: 900, color: "var(--pink)", letterSpacing: 2 }}>YOU HAVE BEEN SORTED INTO...</span>
+              <span style={{ fontSize: 11, fontWeight: 900, color: "var(--pink)", letterSpacing: 2 }}>YOU BELONG IN...</span>
               <h3 style={{
-                fontFamily: "'Cinzel Decorative', serif",
+                fontFamily: "'Nunito', sans-serif",
+                fontWeight: 900,
                 fontSize: 26,
                 color: housesInfo[finalHouse].color,
                 marginTop: 6,
@@ -553,16 +556,16 @@ export default function Home() {
                 maxWidth: 450,
                 margin: "0 auto 24px"
               }}>
-                <p style={{ fontSize: 14, color: "#fff6df", fontWeight: 700, lineHeight: 1.6 }}>
+                <p style={{ fontSize: 14, color: "var(--navy)", fontWeight: 700, lineHeight: 1.6 }}>
                   {housesInfo[finalHouse].desc}
                 </p>
               </div>
               <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
                 <button className="btn-primary" onClick={resetQuiz}>
-                  Sort Again 🔄
+                  Quiz Again 🔄
                 </button>
                 <button className="btn-secondary" onClick={() => navigate("/opportunities")}>
-                  Explore Opportunities 🏰
+                  Explore Opportunities 🚀
                 </button>
               </div>
             </div>
