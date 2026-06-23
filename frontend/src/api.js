@@ -3,9 +3,13 @@ import initialOpportunities from "./data/opportunities.js";
 
 const BASE_URL = "http://localhost:8000/api";
 
+// YOUR email — always gets admin role
+const ADMIN_EMAIL = "dharssigakathirvel@gmail.com";
+
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
+  timeout: 4000,
 });
 
 axiosInstance.interceptors.request.use((config) => {
@@ -14,33 +18,32 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-// Helper to get/set mock data in localStorage
+// ── Mock DB helpers ──────────────────────────────────────────────────
 const getMockUsers = () => JSON.parse(localStorage.getItem("mock_users") || "[]");
 const saveMockUsers = (users) => localStorage.setItem("mock_users", JSON.stringify(users));
 
 const getMockOpportunities = () => {
-  let opps = localStorage.getItem("mock_opportunities");
-  if (!opps) {
+  const stored = localStorage.getItem("mock_opportunities");
+  if (!stored) {
     localStorage.setItem("mock_opportunities", JSON.stringify(initialOpportunities));
     return initialOpportunities;
   }
-  return JSON.parse(opps);
+  return JSON.parse(stored);
 };
-const saveMockOpportunities = (opps) => localStorage.setItem("mock_opportunities", JSON.stringify(opps));
+const saveMockOpportunities = (opps) =>
+  localStorage.setItem("mock_opportunities", JSON.stringify(opps));
 
-// Mock router handler
+// ── Mock route handler (offline fallback) ────────────────────────────
 const handleMockRequest = async (method, url, data) => {
-  console.log(`[Mock API] Intercepted ${method.toUpperCase()} ${url}`, data);
-  
-  // Normalize URL to remove baseURL
   const path = url.replace(/^\/?api/, "").replace(/^\//, "");
-  
-  // 1. Auth Signup
+
+  // ── SIGNUP ──
   if (path === "auth/signup" && method === "post") {
     const users = getMockUsers();
-    if (users.some(u => u.email === data.email)) {
+    if (users.some((u) => u.email === data.email)) {
       throw { response: { data: { message: "User already exists with this email ❌" } } };
     }
+    const isAdmin = data.email === ADMIN_EMAIL;
     const newUser = {
       id: "u_" + Date.now(),
       name: data.name,
@@ -50,62 +53,45 @@ const handleMockRequest = async (method, url, data) => {
       totalMarks: Number(data.totalMarks),
       interest: data.interest || "",
       state: data.state || "",
-      role: data.email.includes("admin") ? "admin" : "student", // Simple rule to make admin
+      role: isAdmin ? "admin" : "student",
     };
     users.push(newUser);
     saveMockUsers(users);
-    
-    return {
-      data: {
-        token: "mock-jwt-token-for-" + newUser.id,
-        user: newUser
-      }
-    };
+    return { data: { token: "mock-jwt-" + newUser.id, user: newUser } };
   }
-  
-  // 2. Auth Login
+
+  // ── LOGIN ──
   if (path === "auth/login" && method === "post") {
     const users = getMockUsers();
-    const user = users.find(u => u.email === data.email);
-    // Simple password check (accept anything for mock demo)
+    let user = users.find((u) => u.email === data.email);
+    const isAdmin = data.email === ADMIN_EMAIL;
     if (!user) {
-      // Create a default admin or student if not found just to make testing extremely easy!
-      const isDefaultAdmin = data.email.includes("admin");
-      const defaultUser = {
-        id: "u_default",
-        name: isDefaultAdmin ? "Default Admin" : "Default Student",
+      // Auto-create account for easy demo login
+      user = {
+        id: "u_" + Date.now(),
+        name: isAdmin ? "Dharssiga Kathirvel" : "Demo Student",
         email: data.email,
         class: "10",
         obtainedMarks: 90,
         totalMarks: 100,
         interest: "Coding",
-        state: "Delhi",
-        role: isDefaultAdmin ? "admin" : "student"
+        state: "Tamil Nadu",
+        role: isAdmin ? "admin" : "student",
       };
-      users.push(defaultUser);
+      users.push(user);
       saveMockUsers(users);
-      return {
-        data: {
-          token: "mock-jwt-token-for-default",
-          user: defaultUser
-        }
-      };
     }
-    return {
-      data: {
-        token: "mock-jwt-token-for-" + user.id,
-        user
-      }
-    };
+    // Always give admin role to ADMIN_EMAIL even if previously stored as student
+    if (user.email === ADMIN_EMAIL) user.role = "admin";
+    return { data: { token: "mock-jwt-" + user.id, user } };
   }
-  
-  // 3. Get Opportunities
+
+  // ── GET SCHOLARSHIPS ──
   if (path === "scholarships" && method === "get") {
-    const opps = getMockOpportunities();
-    return { data: opps };
+    return { data: getMockOpportunities() };
   }
-  
-  // 4. Add Opportunity
+
+  // ── ADD SCHOLARSHIP ──
   if (path === "scholarships/add" && method === "post") {
     const opps = getMockOpportunities();
     const newOpp = {
@@ -124,87 +110,57 @@ const handleMockRequest = async (method, url, data) => {
     saveMockOpportunities(opps);
     return { data: newOpp };
   }
-  
-  // 5. Delete Opportunity
+
+  // ── DELETE SCHOLARSHIP ──
   if (path.startsWith("scholarships/") && method === "delete") {
     const id = parseInt(path.split("/")[1]);
-    let opps = getMockOpportunities();
-    opps = opps.filter(o => o.id !== id);
-    saveMockOpportunities(opps);
+    saveMockOpportunities(getMockOpportunities().filter((o) => o.id !== id));
     return { data: { success: true } };
   }
-  
-  // 6. Recommend Opportunities
+
+  // ── RECOMMEND ──
   if (path === "scholarships/recommend" && method === "post") {
     const opps = getMockOpportunities();
-    const student = data; // User data sent for recommendations
-    
-    // Filter logic
-    const matched = opps.filter(item => {
-      // Check class range eligibility
-      const studentClass = parseInt(student.class);
-      const isClassEligible = item.classRange ? item.classRange.includes(studentClass) : true;
-      
-      // Check marks eligibility
-      const isMarksEligible = student.obtainedMarks && student.totalMarks
-        ? (student.obtainedMarks / student.totalMarks * 100) >= item.minMarks
-        : true;
-        
-      // Check interest matching
-      const isInterestEligible = item.interest === "All" || 
-        (student.interest && student.interest.toLowerCase() === item.interest.toLowerCase());
-        
-      return isClassEligible && isMarksEligible && isInterestEligible;
+    const student = data;
+    const matched = opps.filter((item) => {
+      const cls = parseInt(student.class);
+      const pct = student.obtainedMarks && student.totalMarks
+        ? (student.obtainedMarks / student.totalMarks) * 100
+        : student.percentage || 0;
+      const classOk = item.classRange ? item.classRange.includes(cls) : true;
+      const marksOk = pct >= item.minMarks;
+      const intOk =
+        item.interest === "All" ||
+        (student.interest || "").toLowerCase().includes(item.interest.toLowerCase());
+      return classOk && marksOk && intOk;
     });
-    
     return { data: matched };
   }
-  
-  throw { response: { data: { message: `Mock route ${method} /${path} not found` } } };
+
+  throw { response: { data: { message: `Mock: route not found — ${method} /${path}` } } };
 };
 
-// Export custom API object that mirrors axios
+// ── Decide: real backend or mock ─────────────────────────────────────
+const isNetworkError = (err) =>
+  !err.response || err.code === "ERR_NETWORK" || err.message === "Network Error";
+
 const API = {
   get: async (url, config) => {
-    try {
-      return await axiosInstance.get(url, config);
-    } catch (err) {
-      if (err.code === "ERR_NETWORK" || err.message === "Network Error" || !err.response) {
-        return await handleMockRequest("get", url);
-      }
-      throw err;
-    }
+    try { return await axiosInstance.get(url, config); }
+    catch (err) { if (isNetworkError(err)) return handleMockRequest("get", url); throw err; }
   },
   post: async (url, data, config) => {
-    try {
-      return await axiosInstance.post(url, data, config);
-    } catch (err) {
-      if (err.code === "ERR_NETWORK" || err.message === "Network Error" || !err.response) {
-        return await handleMockRequest("post", url, data);
-      }
-      throw err;
-    }
+    try { return await axiosInstance.post(url, data, config); }
+    catch (err) { if (isNetworkError(err)) return handleMockRequest("post", url, data); throw err; }
   },
   delete: async (url, config) => {
-    try {
-      return await axiosInstance.delete(url, config);
-    } catch (err) {
-      if (err.code === "ERR_NETWORK" || err.message === "Network Error" || !err.response) {
-        return await handleMockRequest("delete", url);
-      }
-      throw err;
-    }
+    try { return await axiosInstance.delete(url, config); }
+    catch (err) { if (isNetworkError(err)) return handleMockRequest("delete", url); throw err; }
   },
   put: async (url, data, config) => {
-    try {
-      return await axiosInstance.put(url, data, config);
-    } catch (err) {
-      if (err.code === "ERR_NETWORK" || err.message === "Network Error" || !err.response) {
-        return await handleMockRequest("put", url, data);
-      }
-      throw err;
-    }
-  }
+    try { return await axiosInstance.put(url, data, config); }
+    catch (err) { if (isNetworkError(err)) return handleMockRequest("put", url, data); throw err; }
+  },
 };
 
 export default API;

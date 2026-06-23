@@ -11,27 +11,40 @@ const floatBadges = [
 ];
 
 const stats = [
-  { emoji: "🎓", num: "120+", label: "Scholarships" },
-  { emoji: "🏆", num: "45+",  label: "Competitions" },
-  { emoji: "💻", num: "30+",  label: "Hackathons" },
-  { emoji: "🌟", num: "10K+", label: "Students" },
+  { emoji: "🎓", num: "6",   label: "Scholarships" },
+  { emoji: "🏆", num: "4",   label: "Competitions" },
+  { emoji: "💻", num: "3",   label: "Hackathons" },
+  { emoji: "🌟", num: "100+",label: "Students" },
 ];
 
 const QUOTES = [
-  { text: "The roots of education are bitter, but the fruit is sweet.", author: "Aristotle" },
-  { text: "Education is the passport to the future, for tomorrow belongs to those who prepare for it today.", author: "Malcolm X" },
-  { text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
-  { text: "The beautiful thing about learning is that no one can take it away from you.", author: "B.B. King" },
-  { text: "Do not wait for opportunities, create them.", author: "Roy T. Bennett" },
-  { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" }
+  { text: "The roots of education are bitter, but the fruit is sweet.", author: "Aristotle", emoji: "📚", mood: "deep" },
+  { text: "Education is the passport to the future, for tomorrow belongs to those who prepare for it today.", author: "Malcolm X", emoji: "🌍", mood: "powerful" },
+  { text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin", emoji: "💡", mood: "wise" },
+  { text: "The beautiful thing about learning is that no one can take it away from you.", author: "B.B. King", emoji: "🔥", mood: "bold" },
+  { text: "Do not wait for opportunities, create them.", author: "Roy T. Bennett", emoji: "🚀", mood: "energetic" },
+  { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill", emoji: "⚡", mood: "motivating" },
+  { text: "You don't have to be great to start, but you have to start to be great.", author: "Zig Ziglar", emoji: "🌱", mood: "encouraging" },
+  { text: "Strive not to be a success, but rather to be of value.", author: "Albert Einstein", emoji: "🌟", mood: "thoughtful" },
 ];
 
 export default function Home() {
   const navigate = useNavigate();
   const [quoteIndex, setQuoteIndex] = useState(0);
+  const [flipping, setFlipping] = useState(false);
 
   function nextQuote() {
-    setQuoteIndex((prev) => (prev + 1) % QUOTES.length);
+    setFlipping(true);
+    setTimeout(() => {
+      setQuoteIndex((prev) => (prev + 1) % QUOTES.length);
+      setFlipping(false);
+    }, 300);
+  }
+
+  function goToQuote(i) {
+    if (i === quoteIndex) return;
+    setFlipping(true);
+    setTimeout(() => { setQuoteIndex(i); setFlipping(false); }, 300);
   }
 
   return (
@@ -216,142 +229,196 @@ export default function Home() {
       {/* ── Inspirational Quotes Section ── */}
       <section style={{ padding: "0 1.5rem 1.5rem" }}>
         <div style={{
-          background: "linear-gradient(135deg, #1a237e 0%, #1565c0 100%)",
-          borderRadius: 24,
+          background: "linear-gradient(135deg, #0d0d2b 0%, #1a237e 50%, #1565c0 100%)",
+          borderRadius: 28,
           padding: "2.5rem 2rem",
           textAlign: "center",
           color: "white",
-          boxShadow: "0 10px 30px rgba(21, 101, 192, 0.2)",
+          boxShadow: "0 20px 60px rgba(21, 101, 192, 0.35)",
           position: "relative",
           overflow: "hidden",
         }}>
-          {/* Decorative background elements */}
-          <div style={{ position: "absolute", top: -40, left: -40, width: 140, height: 140, borderRadius: "50%", background: "rgba(255,255,255,0.05)" }} />
-          <div style={{ position: "absolute", bottom: -40, right: -40, width: 140, height: 140, borderRadius: "50%", background: "rgba(255,255,255,0.05)" }} />
-          
-          <div style={{ fontSize: 32, marginBottom: 12, animation: "float 3s ease-in-out infinite" }}>✨ Inspiring Words ✨</div>
-          
-          <div style={{ minHeight: "90px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+          {/* Star particles */}
+          {[...Array(6)].map((_, i) => (
+            <div key={i} style={{
+              position: "absolute",
+              width: i % 2 === 0 ? 4 : 6,
+              height: i % 2 === 0 ? 4 : 6,
+              borderRadius: "50%",
+              background: "rgba(255,255,255,0.5)",
+              top: `${10 + i * 14}%`,
+              left: `${5 + i * 16}%`,
+              animation: `float ${2 + i * 0.4}s ease-in-out infinite`,
+              animationDelay: `${i * 0.3}s`,
+            }} />
+          ))}
+
+          {/* Mood emoji */}
+          <div style={{
+            fontSize: 48,
+            marginBottom: 8,
+            animation: "float 3s ease-in-out infinite",
+            filter: "drop-shadow(0 4px 12px rgba(255,255,255,0.3))",
+          }}>
+            {QUOTES[quoteIndex].emoji}
+          </div>
+
+          {/* Quote card with flip animation */}
+          <div style={{
+            minHeight: 110,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            transition: "opacity 0.3s ease, transform 0.3s ease",
+            opacity: flipping ? 0 : 1,
+            transform: flipping ? "translateY(10px)" : "translateY(0)",
+          }}>
             <p style={{
               fontFamily: "'Nunito', sans-serif",
-              fontSize: 18,
+              fontSize: "clamp(15px, 3.5vw, 20px)",
               fontWeight: 800,
               fontStyle: "italic",
-              lineHeight: 1.6,
-              marginBottom: 10,
-              maxWidth: 600,
-              margin: "0 auto 10px",
-              opacity: 0.95
+              lineHeight: 1.65,
+              maxWidth: 560,
+              margin: "0 auto 12px",
+              opacity: 0.97,
+              textShadow: "0 2px 8px rgba(0,0,0,0.3)",
             }}>
               "{QUOTES[quoteIndex].text}"
             </p>
             <p style={{
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: 700,
-              color: "#e3f0ff",
-              letterSpacing: 0.5
+              color: "#90caf9",
+              letterSpacing: 1,
+              textTransform: "uppercase",
             }}>
               — {QUOTES[quoteIndex].author}
             </p>
           </div>
 
+          {/* Progress dots */}
+          <div style={{ display: "flex", justifyContent: "center", gap: 8, margin: "16px 0" }}>
+            {QUOTES.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goToQuote(i)}
+                style={{
+                  width: i === quoteIndex ? 24 : 8,
+                  height: 8,
+                  borderRadius: 4,
+                  background: i === quoteIndex ? "white" : "rgba(255,255,255,0.3)",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: 0,
+                  transition: "all 0.3s ease",
+                }}
+              />
+            ))}
+          </div>
+
           <button
             onClick={nextQuote}
             style={{
-              marginTop: 18,
-              background: "rgba(255, 255, 255, 0.15)",
+              background: "rgba(255,255,255,0.12)",
               color: "white",
-              border: "2px solid rgba(255, 255, 255, 0.3)",
-              borderRadius: 20,
-              padding: "8px 24px",
+              border: "2px solid rgba(255,255,255,0.25)",
+              borderRadius: 22,
+              padding: "10px 28px",
               fontFamily: "'Nunito', sans-serif",
-              fontWeight: 800,
-              fontSize: 13,
+              fontWeight: 900,
+              fontSize: 14,
               cursor: "pointer",
-              backdropFilter: "blur(4px)",
+              backdropFilter: "blur(8px)",
               transition: "all 0.2s ease",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
             }}
             onMouseEnter={e => {
               e.currentTarget.style.background = "white";
               e.currentTarget.style.color = "#1565c0";
+              e.currentTarget.style.transform = "scale(1.05)";
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.background = "rgba(255, 255, 255, 0.15)";
+              e.currentTarget.style.background = "rgba(255,255,255,0.12)";
               e.currentTarget.style.color = "white";
+              e.currentTarget.style.transform = "scale(1)";
             }}
           >
-            Inspire Me More 🔄
+            Next Quote ✨
           </button>
         </div>
       </section>
 
-      {/* ── Connect with Me Footer Tab ── */}
+      {/* ── Connect with Me ── */}
       <section style={{ padding: "0 1.5rem 2.5rem", textAlign: "center" }}>
         <div style={{
-          background: "white",
-          border: "2px solid #e3f0ff",
-          borderRadius: 24,
-          padding: "2rem 1.5rem",
-          boxShadow: "0 8px 32px rgba(21, 101, 192, 0.05)",
+          background: "linear-gradient(135deg, #fff9f0 0%, #fff0f7 100%)",
+          border: "2px solid #fce4ef",
+          borderRadius: 28,
+          padding: "2.5rem 1.5rem",
+          boxShadow: "0 8px 32px rgba(233, 30, 140, 0.07)",
         }}>
+          <div style={{ fontSize: 36, marginBottom: 6 }}>🤝</div>
           <h3 style={{
             fontFamily: "'Nunito', sans-serif",
             fontWeight: 900,
-            fontSize: 18,
-            color: "#1a237e",
+            fontSize: 20,
+            background: "linear-gradient(135deg,#e91e8c,#1565c0)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
             marginBottom: 4,
           }}>
-            🤝 Connect with Me
+            Connect with Me
           </h3>
-          <p style={{ fontSize: 13, color: "#7986cb", fontWeight: 700, marginBottom: 20 }}>
-            Let's build something amazing together!
+          <p style={{ fontSize: 13, color: "#7986cb", fontWeight: 700, marginBottom: 24 }}>
+            Built with ❤️ by Dharssiga &mdash; let's connect!
           </p>
 
-          <div style={{
-            display: "flex",
-            justifyContent: "center",
-            flexWrap: "wrap",
-            gap: 12,
-          }}>
+          <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 14 }}>
             {[
-              { label: "GitHub", href: "https://github.com/Dharssigakathirvel", emoji: "🐙", color: "#24292e", hoverBg: "#f6f8fa" },
-              { label: "LeetCode", href: "https://leetcode.com/Dharssigakathirvel", emoji: "💻", color: "#ffa116", hoverBg: "#fff9f0" },
-              { label: "LinkedIn", href: "https://www.linkedin.com/in/dharssiga-kathirvel-0aa5b5326/", emoji: "💼", color: "#0077b5", hoverBg: "#f0f7fa" },
-              { label: "Email", href: "mailto:dharssigakathirvel@gmail.com", emoji: "📧", color: "#e91e8c", hoverBg: "#fdf0f6" }
-            ].map(social => (
+              { label: "GitHub",   href: "https://github.com/Dharssigakathirvel",                         emoji: "🐙", bg: "#24292e", light: "#f6f8fa" },
+              { label: "LeetCode", href: "https://leetcode.com/u/Dharssigakathirvel/",                    emoji: "💻", bg: "#ffa116", light: "#fff9f0" },
+              { label: "LinkedIn", href: "https://www.linkedin.com/in/dharssiga-kathirvel-0aa5b5326/",   emoji: "💼", bg: "#0077b5", light: "#f0f7fb" },
+              { label: "Email",    href: "mailto:dharssigakathirvel@gmail.com",                            emoji: "📧", bg: "#e91e8c", light: "#fdf0f6" },
+            ].map((s) => (
               <a
-                key={social.label}
-                href={social.href}
+                key={s.label}
+                href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="card-hover"
                 style={{
-                  display: "flex",
+                  display: "inline-flex",
                   alignItems: "center",
-                  gap: 8,
+                  gap: 10,
                   textDecoration: "none",
-                  border: `2px solid ${social.color}33`,
-                  borderRadius: 16,
-                  padding: "10px 20px",
+                  background: "white",
+                  border: `2px solid ${s.bg}22`,
+                  borderRadius: 18,
+                  padding: "12px 22px",
                   fontSize: 14,
-                  fontWeight: 800,
-                  color: social.color,
-                  transition: "all 0.2s ease",
-                  background: "white"
+                  fontWeight: 900,
+                  color: s.bg,
+                  fontFamily: "'Nunito', sans-serif",
+                  transition: "all 0.22s cubic-bezier(.4,0,.2,1)",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
                 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = social.color;
-                  e.currentTarget.style.background = social.hoverBg;
-                  e.currentTarget.style.transform = "translateY(-3px)";
+                  e.currentTarget.style.background = s.light;
+                  e.currentTarget.style.borderColor = s.bg;
+                  e.currentTarget.style.transform = "translateY(-4px) scale(1.04)";
+                  e.currentTarget.style.boxShadow = `0 8px 20px ${s.bg}30`;
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = `${social.color}33`;
                   e.currentTarget.style.background = "white";
-                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.borderColor = `${s.bg}22`;
+                  e.currentTarget.style.transform = "translateY(0) scale(1)";
+                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.04)";
                 }}
               >
-                <span>{social.emoji}</span>
-                <span>{social.label}</span>
+                <span style={{ fontSize: 20 }}>{s.emoji}</span>
+                {s.label}
               </a>
             ))}
           </div>

@@ -36,6 +36,8 @@ export default function Navbar() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("student");
+    localStorage.removeItem("mock_users");
+    localStorage.removeItem("mock_opportunities");
     window.location.href = "/login";
   }
 

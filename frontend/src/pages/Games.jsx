@@ -295,12 +295,100 @@ function CodeFill(){
   );
 }
 
+// ── GAME 5: Tic Tac Toe (2-player) ─────────────────────────────────
+const WINS = [
+  [0,1,2],[3,4,5],[6,7,8], // rows
+  [0,3,6],[1,4,7],[2,5,8], // cols
+  [0,4,8],[2,4,6],         // diagonals
+];
+function TicTacToe(){
+  const [board, setBoard] = useState(Array(9).fill(null));
+  const [xTurn, setXTurn] = useState(true);
+  const [winLine, setWinLine] = useState(null);
+
+  function getWinner(b){
+    for(const [a,c,d] of WINS){
+      if(b[a] && b[a]===b[c] && b[a]===b[d]) return {winner:b[a], line:[a,c,d]};
+    }
+    if(b.every(Boolean)) return {winner:"Draw", line:[]};
+    return null;
+  }
+
+  function click(i){
+    if(board[i] || winLine) return;
+    const next = board.slice();
+    next[i] = xTurn ? "X" : "O";
+    const result = getWinner(next);
+    setBoard(next);
+    setXTurn(!xTurn);
+    if(result) setWinLine(result);
+  }
+
+  function reset(){ setBoard(Array(9).fill(null)); setXTurn(true); setWinLine(null); }
+
+  const result = winLine;
+  const cellColors = {
+    X: "linear-gradient(135deg,#e91e8c,#c2185b)",
+    O: "linear-gradient(135deg,#1565c0,#1a237e)",
+    null: "linear-gradient(135deg,#fce4ef,#e3f0ff)",
+  };
+
+  return (
+    <div style={{ background:"white", borderRadius:24, padding:"1.5rem", border:"2px solid #e3f0ff" }}>
+      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:12, alignItems:"center" }}>
+        <span style={{ fontSize:11, fontWeight:800, color:"#7986cb" }}>⭕ Tic Tac Toe</span>
+        {result ? (
+          <span style={{ fontSize:12, fontWeight:900, color: result.winner==="Draw"?"#ff6f00":"#e91e8c" }}>
+            {result.winner==="Draw" ? "🤝 It's a Draw!" : `🏆 Player ${result.winner} Wins!`}
+          </span>
+        ) : (
+          <span style={{ fontSize:12, fontWeight:800, color: xTurn?"#e91e8c":"#1565c0" }}>
+            {xTurn ? "🔴 X's Turn" : "🔵 O's Turn"}
+          </span>
+        )}
+      </div>
+
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8, margin:"1rem 0" }}>
+        {board.map((val,i)=>{
+          const isWinCell = result?.line?.includes(i);
+          return (
+            <div key={i} onClick={()=>click(i)} style={{
+              height:80, borderRadius:16,
+              background: isWinCell ? "linear-gradient(135deg,#43a047,#2e7d32)" : cellColors[val],
+              display:"flex", alignItems:"center", justifyContent:"center",
+              fontSize:36, fontWeight:900, cursor: val||result?"default":"pointer",
+              color: val==="X"?"white" : val==="O"?"white" : "transparent",
+              border: isWinCell?"3px solid #43a047":"2px solid transparent",
+              transition:"all 0.2s ease",
+              transform: isWinCell?"scale(1.08)":"scale(1)",
+              userSelect:"none",
+              boxShadow: val ? "0 4px 12px rgba(0,0,0,0.12)" : "none",
+            }}>
+              {val || "·"}
+            </div>
+          );
+        })}
+      </div>
+
+      <button onClick={reset} style={{
+        width:"100%", marginTop:4,
+        background:"linear-gradient(135deg,#fce4ef,#e3f0ff)",
+        border:"2px solid #e3f0ff", borderRadius:14,
+        padding:"10px", fontFamily:"'Nunito',sans-serif",
+        fontWeight:800, fontSize:13, color:"#1a237e", cursor:"pointer",
+        transition:"background 0.2s",
+      }}>🔄 New Game</button>
+    </div>
+  );
+}
+
 // ── MAIN Games Page ───────────────────────────────────────────────
 const GAMES = [
   { id:"math",   label:"Math Blitz",    emoji:"🧮", desc:"Solve fast! Beat the clock",  color:"#e3f0ff", border:"#bbdefb" },
   { id:"word",   label:"Word Scramble", emoji:"🔤", desc:"Unscramble science & tech words", color:"#fce4ef", border:"#f8bbd0" },
   { id:"memory", label:"Memory Match",  emoji:"🧠", desc:"Find the matching pairs",      color:"#e8f5e9", border:"#c8e6c9" },
   { id:"code",   label:"Code Fill-in",  emoji:"💻", desc:"Complete the code snippet",    color:"#ede7f6", border:"#d1c4e9" },
+  { id:"ttt",    label:"Tic Tac Toe",   emoji:"⭕", desc:"2-player classic! X vs O",    color:"#fff3e0", border:"#ffe0b2" },
 ];
 
 export default function Games(){
@@ -386,6 +474,7 @@ export default function Games(){
             {active==="word"   && <WordScramble />}
             {active==="memory" && <MemoryMatch />}
             {active==="code"   && <CodeFill />}
+            {active==="ttt"    && <TicTacToe />}
           </div>
         )}
       </div>
