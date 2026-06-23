@@ -96,15 +96,16 @@ const handleMockRequest = async (method, url, data) => {
     const opps = getMockOpportunities();
     const newOpp = {
       id: opps.length + 1,
-      title: data.title,
+      title: data.title || data.name,
       type: data.type,
       emoji: data.emoji || "🎓",
       description: data.description,
       class: data.class,
       classRange: data.classRange || [8, 9, 10, 11, 12],
-      minMarks: Number(data.minMarks),
-      interest: data.interest,
+      minMarks: Number(data.minMarks !== undefined ? data.minMarks : data.minPercentage),
+      interest: data.interest || data.state,
       deadline: data.deadline,
+      officialLink: data.officialLink,
     };
     opps.push(newOpp);
     saveMockOpportunities(opps);

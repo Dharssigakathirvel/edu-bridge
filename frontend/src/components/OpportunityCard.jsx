@@ -54,7 +54,7 @@ export default function OpportunityCard({ item }) {
         color: "#1a237e",
         lineHeight: 1.3,
       }}>
-        {item.title}
+        {item.title || item.name}
       </h2>
 
       {/* description */}
@@ -83,14 +83,28 @@ export default function OpportunityCard({ item }) {
       </div>
 
       {/* CTA */}
-      <button
-        className="btn-primary"
-        style={{ marginTop: 6, width: "100%", padding: "10px" }}
-        onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
-        onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
-      >
-        View Details →
-      </button>
+      {item.officialLink ? (
+        <a
+          href={item.officialLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-primary"
+          style={{ marginTop: 6, width: "100%", padding: "10px", textAlign: "center", textDecoration: "none", display: "block" }}
+          onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
+          onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+        >
+          Apply Now 🔗
+        </a>
+      ) : (
+        <button
+          className="btn-primary"
+          style={{ marginTop: 6, width: "100%", padding: "10px" }}
+          onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
+          onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+        >
+          View Details →
+        </button>
+      )}
     </div>
   );
 }

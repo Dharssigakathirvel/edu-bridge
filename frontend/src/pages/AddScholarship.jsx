@@ -21,7 +21,7 @@ export default function AddScholarship() {
   }
 
   const [tab, setTab]         = useState("add"); // "add" | "manage"
-  const [form, setForm]       = useState({ title:"", description:"", type:"Scholarship", emoji:"🎓", class:"", minMarks:"", interest:"All", deadline:"" });
+  const [form, setForm]       = useState({ title:"", description:"", type:"Scholarship", emoji:"🎓", class:"", minMarks:"", interest:"All", deadline:"", officialLink:"" });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError]     = useState("");
@@ -52,11 +52,14 @@ export default function AddScholarship() {
     try {
       const res = await API.post("/scholarships/add", {
         ...form,
+        name: form.title,
+        minPercentage: Number(form.minMarks),
+        state: form.interest,
         minMarks: Number(form.minMarks),
         classRange,
       });
       setSuccess(res.data.message || "Scholarship added! 🎉");
-      setForm({ title:"", description:"", type:"Scholarship", emoji:"🎓", class:"", minMarks:"", interest:"All", deadline:"" });
+      setForm({ title:"", description:"", type:"Scholarship", emoji:"🎓", class:"", minMarks:"", interest:"All", deadline:"", officialLink:"" });
     } catch (err) {
       setError(err.response?.data?.message || "Failed to add ❌");
     } finally {
@@ -72,6 +75,7 @@ export default function AddScholarship() {
     { name:"class",         placeholder:"Eligible Class (e.g. Class 8–12) 📚",type:"text",   required:true },
     { name:"minMarks",      placeholder:"Minimum Marks/Percentage % 🏆",    type:"number", required:true },
     { name:"interest",      placeholder:"Interest Area (e.g. Coding, Math, Science, All) 🎨", type:"text", required:true },
+    { name:"officialLink",  placeholder:"Official Application Link (URL) 🔗", type:"url",    required:false },
     { name:"deadline",      placeholder:"Deadline (e.g. 30 July 2026) ⏳",   type:"text",   required:true },
   ];
 
@@ -244,12 +248,17 @@ function ManageTab() {
           }}>🎓</div>
           <div style={{ flex:1 }}>
             <h3 style={{ fontFamily:"'Nunito',sans-serif", fontWeight:900, fontSize:14, color:"#1a237e", marginBottom:3 }}>
-              {s.name}
+              {s.title || s.name}
             </h3>
             <p style={{ fontSize:12, color:"#7986cb", fontWeight:600, marginBottom:6 }}>{s.description}</p>
             <div style={{ fontSize:11, fontWeight:700, color:"#9e9e9e" }}>
-              Class {s.class} · Min {s.minPercentage}% · {s.state}
+              Class {s.class} · Min {s.minMarks !== undefined ? s.minMarks : s.minPercentage}% · {s.interest || s.state}
             </div>
+            {s.officialLink && (
+              <a href={s.officialLink} target="_blank" rel="noopener noreferrer" style={{ fontSize:11, color:"#e91e8c", fontWeight:700, textDecoration:"none", display:"inline-block", marginTop:4 }}>
+                🔗 Application Link
+              </a>
+            )}
           </div>
           <button
             onClick={() => handleDelete(s._id)}
