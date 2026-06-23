@@ -13,9 +13,13 @@ export default function Dashboard() {
   let savedStudent = null;
   try { savedStudent = JSON.parse(localStorage.getItem("student")); } catch {}
 
+  const userPct = user?.obtainedMarks && user?.totalMarks
+    ? Math.round((user.obtainedMarks / user.totalMarks) * 100)
+    : (user?.percentage || savedStudent?.marks || "");
+
   const [form, setForm] = useState({
     class:      user?.class      || savedStudent?.class      || "",
-    percentage: user?.percentage || savedStudent?.marks      || "",
+    percentage: userPct,
     state:      user?.state      || savedStudent?.state      || "",
   });
   const [results, setResults]   = useState([]);

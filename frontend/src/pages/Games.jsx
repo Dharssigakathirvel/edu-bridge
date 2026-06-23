@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Navbar from "../components/Navbar.jsx";
 
 // ── GAME 1: Math Puzzle ──────────────────────────────────────────
@@ -753,24 +753,6 @@ export default function Games(){
                   <div style={{ fontFamily:"'Cinzel Decorative',serif", fontWeight:900, fontSize:15, color:"var(--pink)", marginBottom:4 }}>{g.label}</div>
                   <div style={{ fontSize:12, fontWeight:700, color:"#dfd2b5" }}>{g.desc}</div>
                 </div>
-              ))}
-            </div>
-
-            {/* Fun facts */}
-            <div style={{ background:"#130c1d", borderRadius:22, padding:"1.25rem", border:"2px solid var(--pink)" }}>
-              <p style={{ fontFamily:"'Cinzel Decorative',serif", fontWeight:900, fontSize:14, color:"var(--pink)", marginBottom:10 }}>
-                💡 Did you know?
-              </p>
-              {[
-                "Playing math games for 15 mins/day improves exam scores by 20%! 🧮",
-                "Coding is the 2nd most in-demand skill worldwide in 2025! 💻",
-                "Memory games strengthen focus and help in exams! 🧠",
-              ].map((f,i)=>(
-                <div key={i} style={{
-                  padding:"8px 12px", borderRadius:12,
-                  background: i%2===0 ? "#23132e" : "#121a2d",
-                  marginBottom:8, fontSize:13, fontWeight:700, color:"#dfd2b5",
-                }}>{f}</div>
               ))}
             </div>
           </>
